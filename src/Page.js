@@ -7,11 +7,14 @@ import {
   serverTimestamp,
   onSnapshot,
   query,
-  orderBy
+  orderBy,
+  deleteDoc,
+  doc
 } from 'firebase/firestore';
+import { FaTrash } from 'react-icons/fa';
 import './Page.css';
 
-export default function Page ({ side, content, flipProgress, user, ...handlers }) {
+export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, ...handlers }) {
   const rotation = side === 'right'
     ? -180 * flipProgress
     : 180 * flipProgress;
@@ -52,6 +55,15 @@ export default function Page ({ side, content, flipProgress, user, ...handlers }
     setInput('');
   };
 
+  const handleDelete = async (messageId) => {
+    try {
+      await deleteDoc(doc(db, 'chatrooms', roomId, 'messages', messageId));
+    }
+    catch(err) {
+      console.error('Delete failed:', err);
+    }
+  }
+
   const renderContent = () => {
     if (!content) return null;
 
@@ -68,19 +80,34 @@ export default function Page ({ side, content, flipProgress, user, ...handlers }
       return (
         <div className="chatroom">
           <div className="messages">
-            {messages.map((msg) => (
-              <div key={msg.id} className={`bubble ${msg.uid === user?.uid ? 'self' : 'other'}`}>
-                <div className="sender">{msg.sender}</div>
-                <div className="text">{msg.text}</div>
-              </div>
-            ))}
+            {messages.map((msg) => {
+              const date = msg.timestamp?.toDate?.() || new Date();
+              const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+              return (
+                <div key={msg.id} className={`bubble ${msg.uid === user?.uid ? 'self' : 'other'}`}>
+                  <div className='bubble-header'>
+                    <span className='sender'>{msg.sender}</span>
+                    {msg.uid === user?.uid && (
+                      <FaTrash
+                        className="delete-icon"
+                        onClick={() => handleDelete(msg.id)}
+                      />
+                    )}
+                  </div>
+                  <div className="text">{msg.text}</div>                  
+                  <div className="time">{timeString}</div>
+                </div>
+              );
+            })}
           </div>
-          {user && (
+    
+          {!flippingFromSignIn && user && (
             <form className="input-box" onSubmit={handleSend}>
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Type a message..."
+                placeholder="Type a message…"
               />
               <button type="submit">Send</button>
             </form>

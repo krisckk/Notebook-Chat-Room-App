@@ -16,6 +16,10 @@ export default function Notebook({ user }) {
   useEffect(() => {
     if(user) {
       setFlippingFromSignIn(true);
+      setTimeout(() => {
+        const spiral = document.querySelector('.spiral');
+        if (spiral) spiral.classList.add('jiggle');
+      }, 50);
       let progress = 0;
       const duration = 1000; // 1s animation
       const start = performance.now();
@@ -34,7 +38,8 @@ export default function Notebook({ user }) {
             setFlipProgress(0);
             setFlipDirection(null);
             setFlippingFromSignIn(false);
-          }, 50);
+            document.querySelector('.spiral')?.classList.remove('jiggle');
+          }, 1000);
         }
       };
 
@@ -112,9 +117,16 @@ export default function Notebook({ user }) {
       )}
       <Page
         side="right"
-        content={user && !flippingFromSignIn ? pages[rightIndex] : { type: 'signin' }}
+        content={
+          flippingFromSignIn
+            ? pages[rightIndex] // already preload it
+            : user
+            ? pages[rightIndex]
+            : { type: 'signin' }
+        }        
         user={user}
         flipProgress={flipDirection === 'forward' ? flipProgress : 0}
+        flippingFromSignIn={flippingFromSignIn}
         onPointerDown={(e) => user && startDrag(e, 'forward')}
         onPointerMove={handleDrag}
         onPointerUp={endDrag}
