@@ -1,0 +1,33 @@
+.notebook {
+    position: relative;
+    width: 800px;       /* two 400px-wide pages */
+    height: 600px;
+    margin: 40px auto;
+    perspective: 1500px;
+    perspective-origin: center center;
+    background: #e5e5dc; /* subtle background */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+  }
+  .spiral {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    z-index: 2;
+    pointer-events: none;
+  }
+  
+  .spiral-ring {
+    width: 10px;
+    height: 10px;
+    border: 2px solid #444;
+    border-radius: 50%;
+    background: #fff;
+  }
+  

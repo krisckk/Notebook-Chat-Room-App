@@ -1,13 +1,74 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+.chatroom {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 20px;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.messages {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
+
+.bubble {
+  max-width: 70%;
+  padding: 10px;
+  border-radius: 15px;
+  background: #f1f0f0;
+}
+
+.bubble.self {
+  align-self: flex-end;
+  background: #dcf8c6;
+}
+
+.bubble.other {
+  align-self: flex-start;
+  background: #ffffff;
+}
+
+.sender {
+  font-weight: bold;
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.text {
+  font-size: 16px;
+}
+
+.input-box {
+  display: flex;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.input-box input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+}
+
+.input-box button {
+  padding: 8px 16px;
+  border: none;
+  background: #4caf50;
+  color: white;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.notebook {
+  position: relative;
+  width: 800px;
+  height: 600px;
+  perspective: 1500px;
+  perspective-origin: center;
+  margin: 40px auto;
+}
+

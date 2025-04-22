@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import { auth, provider } from './firebase';
+import { signInWithPopup, signOut } from 'firebase/auth';
+import Notebook from './Notebook';
 
-function App() {
+export default function App() {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const unsubscibe = auth.onAuthStateChanged(setUser);
+    return () => unsubscibe();
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+      {user && (
+        <button
+          style={{
+            position: 'absolute',
+            top: 20,
+            right: 20,
+            zIndex: 1000,
+            padding: '8px 16px',
+            background: '#ff4f4f',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+          }}
+          onClick={() => signOut(auth)}
         >
-          Learn React
-        </a>
-      </header>
+          Sign Out
+        </button>
+      )}
+      <Notebook user={user} />
     </div>
   );
-}
+};
 
-export default App;
