@@ -1,12 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { auth, provider } from './firebase';
+import { db, auth, provider } from './firebase';
+import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
 import { signInWithPopup, signOut } from 'firebase/auth';
 import Notebook from './Notebook';
 
 export default function App() {
   const [user, setUser] = useState(null);
 
-  useEffect(() => {
+  useEffect(async () => {
+    if(user) {
+      await setDoc(doc(db, 'users', user.uid), {
+        displayName: user.displayName,
+        email: user.email,
+        createdAt: serverTimestamp()
+      }, { merge: true });
+    }
     const unsubscibe = auth.onAuthStateChanged(setUser);
     return () => unsubscibe();
   }, []);

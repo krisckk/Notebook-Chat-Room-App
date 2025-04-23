@@ -12,6 +12,8 @@ import {
   doc
 } from 'firebase/firestore';
 import { FaTrash } from 'react-icons/fa';
+import FriendsManager from './FriendsManager';
+import ProfileManager from './ProfileManager';
 import './Page.css';
 
 export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, ...handlers }) {
@@ -66,6 +68,15 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
 
   const renderContent = () => {
     if (!content) return null;
+
+    if(side === 'left' && user) {
+      return (
+        <>
+          <ProfileManager user={user} />
+          <FriendsManager user={user} />
+        </>
+      );
+    }
 
     if (content.type === 'signin') {
       return (
