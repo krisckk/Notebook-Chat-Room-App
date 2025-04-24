@@ -16,7 +16,7 @@ import FriendsManager from './FriendsManager';
 import ProfileManager from './ProfileManager';
 import './Page.css';
 
-export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, ...handlers }) {
+export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, currentFriend, onFriendSelect, ...handlers }) {
   const rotation = side === 'right'
     ? -180 * flipProgress
     : 180 * flipProgress;
@@ -45,14 +45,31 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
 
   const handleSend = async (e) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || !user?.uid || !content?.roomId){
+      console.error("Missing required data for sending message.");
+      return;
+    }
+    console.log("Current user:", user?.displayName);
+    console.log("Current friend:", currentFriend?.displayName);
+    console.log("Room ID:", content?.roomId);
 
-    await addDoc(collection(db, 'chatrooms', roomId, 'messages'), {
-      text: input,
-      sender: user.displayName,
-      uid: user.uid,
-      timestamp: serverTimestamp()
-    });
+    try {
+      const messageData = {
+        text: input,
+        sender: user.displayName,
+        senderId: user.uid,
+        receiver: currentFriend?.displayName || 'public',
+        receiverId: currentFriend?.id || 'public',
+        timestamp: serverTimestamp()
+      };
+      console.log("Attempting to send message:", messageData);
+      await addDoc(collection(db, 'chatrooms', content.roomId, 'messages'), messageData);
+      setInput('');
+    } 
+    catch (error) {
+      console.error("Error sending message:", error);
+      alert("Couldn't send message. Please check your permissions.");
+    }
 
     setInput('');
   };
@@ -73,7 +90,10 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
       return (
         <>
           <ProfileManager user={user} />
-          <FriendsManager user={user} />
+          <FriendsManager 
+            user={user}
+            onFriendSelect={onFriendSelect} 
+          />
         </>
       );
     }

@@ -61,6 +61,31 @@
     color: #888;
     transition: color 0.2s;
 }
+
 .fn-trash:hover {
     color: #e74c3c;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.clickable:hover {
+    text-decoration: underline;
+    color: #4285f4;
+}
+
+.friend-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.fn-chat {
+    cursor: pointer;
+    color: #888;
+    transition: color 0.2s;
+}
+
+.fn-chat:hover {
+    color: #4285f4;
 }

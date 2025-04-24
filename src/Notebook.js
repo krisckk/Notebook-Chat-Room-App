@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import Page from './Page';
 import pages from './pagesData';
 import './Notebook.css';
+import { getChatPageIndex  } from './pageNavigation';
 
 export default function Notebook({ user }) {
   const [currentPage, setCurrentPage] = useState(0);
@@ -11,7 +12,19 @@ export default function Notebook({ user }) {
   const [justSignedIn, setJustSignedIn] = useState(false);
   const [justSignedOut, setJustSignedOut] = useState(false);
   const [flippingFromSignIn, setFlippingFromSignIn] = useState(false);
+  const [currentFriend, setCurrentFriend] = useState(null);
   const startXRef = useRef(0);
+
+  const handleFriendSelect = (friend) => {
+    setCurrentFriend(friend);
+    const roomId = generateRoomId(user.uid, friend.id);
+    setCurrentPage(getChatPageIndex(pages, roomId)); 
+  }
+
+  const generateRoomId = (userId1, userId2) => {
+    const sortedIds = [userId1, userId2].sort();
+    return sortedIds.join('-');
+  }
 
   useEffect(() => {
     if(user) {
@@ -113,18 +126,26 @@ export default function Notebook({ user }) {
           onPointerDown={(e) => startDrag(e, 'backward')}
           onPointerMove={handleDrag}
           onPointerUp={endDrag}
+          onFriendSelect={handleFriendSelect}
         />
       )}
       <Page
         side="right"
         content={
-          flippingFromSignIn
-            ? pages[rightIndex] // already preload it
-            : user
-            ? pages[rightIndex]
-            : { type: 'signin' }
+          currentFriend 
+                        ? { 
+                            type: 'chat',
+                            roomId: generateRoomId(user.uid, currentFriend.id),
+                            friend: currentFriend 
+                          }
+                        : flippingFromSignIn
+                            ? pages[rightIndex]
+                            : user
+                                ? pages[rightIndex]
+                                : { type: 'signin' }
         }        
         user={user}
+        currentFriend={currentFriend}
         flipProgress={flipDirection === 'forward' ? flipProgress : 0}
         flippingFromSignIn={flippingFromSignIn}
         onPointerDown={(e) => user && startDrag(e, 'forward')}
@@ -134,4 +155,3 @@ export default function Notebook({ user }) {
     </div>
   );
 };
-

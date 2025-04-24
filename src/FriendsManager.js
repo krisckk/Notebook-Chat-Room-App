@@ -12,9 +12,9 @@ import {
     doc
 } from "firebase/firestore";
 import './FriendsManager.css'
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaComment, FaPaperPlane } from 'react-icons/fa';
 
-export default function FriendsManager({ user}) {
+export default function FriendsManager({ user, onFriendSelect }) {
     const [searchName, setSearchName] = useState('');
     const [friends, setFriends] = useState([]);
     const [error, setError] = useState('');
@@ -80,11 +80,22 @@ export default function FriendsManager({ user}) {
             <ul className="friends-list">
                 {friends.map(f => (
                     <li key={f.id}>
-                    <span className="fn-name">{f.displayName}</span>
-                        <FaTrash
-                            className="fn-trash"
-                            onClick={() => handleRemove(f.id)}
-                        />
+                        <span 
+                            className="fn-name clickable"
+                            onClick={() => onFriendSelect && onFriendSelect(f)}
+                        >
+                            {f.displayName}
+                        </span>
+                        <div className="friend-actions">
+                            <FaComment 
+                                className="fn-chat"
+                                onClick={() => onFriendSelect && onFriendSelect(f)}
+                            />
+                            <FaTrash
+                                className="fn-trash"
+                                onClick={() => handleRemove(f.id)}
+                            />
+                        </div>
                     </li>
                 ))}
             </ul>

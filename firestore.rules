@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+    match /databases/{database}/documents {
+        
+        // 1. User Profiles
+        match /users/{userId} {
+            allow read: if request.auth != null;
+            allow create, update, delete: if request.auth.uid == userId;
+            
+            // Friends subcollection
+            match /friends/{friendId} {
+                allow read, create, delete: if request.auth.uid == userId;
+            }
+        }
+
+        // 2. Chat Rooms System
+        match /chatrooms/{roomId} {
+            function isParticipant() {
+                return request.auth != null && 
+                    (request.auth.uid in roomId.split('_'));
+            }
+            
+            match /messages/{messageId} {
+                allow read, write: if true;
+            }
+        }
+    }
+}

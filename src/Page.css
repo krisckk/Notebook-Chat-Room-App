@@ -73,11 +73,13 @@
 .bubble.self {
   align-self: flex-end;
   background: #dcf8c6;
+  margin-right: 20px;
 }
 
 .bubble.other {
   align-self: flex-start;
   background: #ffffff;
+  margin-left: 20px;
 }
 
 .sender {
