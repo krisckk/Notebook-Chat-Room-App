@@ -13,6 +13,8 @@ export default function Notebook({ user }) {
   const [justSignedOut, setJustSignedOut] = useState(false);
   const [flippingFromSignIn, setFlippingFromSignIn] = useState(false);
   const [currentFriend, setCurrentFriend] = useState(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const [isFlipping, setIsFlipping] = useState(false);
   const startXRef = useRef(0);
 
   const handleFriendSelect = (friend) => {
@@ -25,6 +27,16 @@ export default function Notebook({ user }) {
     const sortedIds = [userId1, userId2].sort();
     return sortedIds.join('-');
   }
+
+  const handleProfileToggle = () => {
+    setIsFlipping(true);
+    setFlipProgress(1);
+    setTimeout(() => {
+      setShowProfile(!showProfile);
+      setFlipProgress(0);
+      setIsFlipping(false);
+    }, 500);
+  };
 
   useEffect(() => {
     if(user) {

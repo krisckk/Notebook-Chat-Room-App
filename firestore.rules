@@ -2,6 +2,18 @@ rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
         
+        function isValidChatroom(roomId) {
+            // Room ID must be in format "user1_uid_user2_uid" (sorted alphabetically)
+            let participants = roomId.split('-');
+            return participants.size() == 2
+                && request.auth.uid in participants
+        }
+
+        function getOtherParticipant(roomId) {
+            let participants = roomId.split('-');
+            return participants[0] == request.auth.uid ? participants[1] : participants[0];
+        }
+
         // 1. User Profiles
         match /users/{userId} {
             allow read: if request.auth != null;
@@ -15,13 +27,29 @@ service cloud.firestore {
 
         // 2. Chat Rooms System
         match /chatrooms/{roomId} {
-            function isParticipant() {
-                return request.auth != null && 
-                    (request.auth.uid in roomId.split('_'));
-            }
+            allow read, write: if isValidChatroom(roomId);
             
             match /messages/{messageId} {
-                allow read, write: if true;
+                allow read: if isValidChatroom(roomId);
+
+                allow create: if
+                    // User is participants
+                    isValidChatroom(roomId) &&
+                    // Sender matches authenticated user 
+                    request.auth.uid == request.resource.data.senderId &&
+                    // Receiver is the other participant
+                    request.resource.data.receiverId == getOtherParticipant(roomId) &&
+                    // Valid message structure
+                    request.resource.data.text is string &&
+                    request.resource.data.timestamp is timestamp;
+                
+                allow delete: if
+                    request.auth.uid in roomId.split('-') &&
+                    request.auth.uid == resource.data.senderId &&
+                    isValidChatroom(roomId);
+                    //request.auth.uid == resource.data.senderId &&
+                    //isValidChatroom(roomId);
+
             }
         }
     }

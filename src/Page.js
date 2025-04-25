@@ -63,7 +63,7 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
         timestamp: serverTimestamp()
       };
       console.log("Attempting to send message:", messageData);
-      await addDoc(collection(db, 'chatrooms', content.roomId, 'messages'), messageData);
+      await addDoc(collection(db, 'chatrooms', roomId, 'messages'), messageData);
       setInput('');
     } 
     catch (error) {
@@ -76,6 +76,7 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
 
   const handleDelete = async (messageId) => {
     try {
+      console.log("Attempting to delete message with ID:", messageId);
       await deleteDoc(doc(db, 'chatrooms', roomId, 'messages', messageId));
     }
     catch(err) {
@@ -116,10 +117,10 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
               const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     
               return (
-                <div key={msg.id} className={`bubble ${msg.uid === user?.uid ? 'self' : 'other'}`}>
+                <div key={msg.id} className={`bubble ${msg.senderId === user?.uid ? 'self' : 'other'}`}>
                   <div className='bubble-header'>
                     <span className='sender'>{msg.sender}</span>
-                    {msg.uid === user?.uid && (
+                    {msg.senderId === user?.uid && (
                       <FaTrash
                         className="delete-icon"
                         onClick={() => handleDelete(msg.id)}
