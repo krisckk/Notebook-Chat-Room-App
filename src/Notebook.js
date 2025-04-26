@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import Page from './Page';
 import pages from './pagesData';
 import './Notebook.css';
-import { getChatPageIndex  } from './pageNavigation';
 
 export default function Notebook({ user }) {
   const [currentPage, setCurrentPage] = useState(0);
@@ -12,15 +11,23 @@ export default function Notebook({ user }) {
   const [justSignedIn, setJustSignedIn] = useState(false);
   const [justSignedOut, setJustSignedOut] = useState(false);
   const [flippingFromSignIn, setFlippingFromSignIn] = useState(false);
-  const [currentFriend, setCurrentFriend] = useState(null);
   const [showProfile, setShowProfile] = useState(false);
-  const [isFlipping, setIsFlipping] = useState(false);
+  const [currentFriend, setCurrentFriend] = useState(null);
   const startXRef = useRef(0);
 
   const handleFriendSelect = (friend) => {
     setCurrentFriend(friend);
     const roomId = generateRoomId(user.uid, friend.id);
-    setCurrentPage(getChatPageIndex(pages, roomId)); 
+    let pageIndex = pages.findIndex(p => p.roomId === roomId);
+    if(pageIndex === -1){
+      pageIndex = pages.length;
+      pages.push({
+        type: 'chat',
+        roomId: roomId,
+        friend: friend
+      });
+    }
+    setCurrentPage(pageIndex % 2 === 0 ? pageIndex : pageIndex - 1); 
   }
 
   const generateRoomId = (userId1, userId2) => {
@@ -29,13 +36,7 @@ export default function Notebook({ user }) {
   }
 
   const handleProfileToggle = () => {
-    setIsFlipping(true);
-    setFlipProgress(1);
-    setTimeout(() => {
-      setShowProfile(!showProfile);
-      setFlipProgress(0);
-      setIsFlipping(false);
-    }, 500);
+    setShowProfile(!showProfile);
   };
 
   useEffect(() => {
@@ -45,6 +46,7 @@ export default function Notebook({ user }) {
         const spiral = document.querySelector('.spiral');
         if (spiral) spiral.classList.add('jiggle');
       }, 50);
+
       let progress = 0;
       const duration = 1000; // 1s animation
       const start = performance.now();
@@ -57,9 +59,10 @@ export default function Notebook({ user }) {
 
         if (progress < 1) {
           requestAnimationFrame(animate);
-        } else {
+        } 
+        else {
           setTimeout(() => {
-            setCurrentPage(0); // ensure it's on page 0
+            setCurrentPage(0);
             setFlipProgress(0);
             setFlipDirection(null);
             setFlippingFromSignIn(false);
@@ -67,7 +70,6 @@ export default function Notebook({ user }) {
           }, 1000);
         }
       };
-
       requestAnimationFrame(animate);
     }
     else {
@@ -131,8 +133,19 @@ export default function Notebook({ user }) {
       {user && !flippingFromSignIn && (
         <Page
           side="left"
-          className={justSignedIn ? 'slide-in' : justSignedOut ? 'slide-out' : ''}
-          content={pages[leftIndex]}
+          className={`
+            ${justSignedIn ? 'slide-in' : ''}
+            ${justSignedOut ? 'slide-out' : ''}
+            ${showProfile ? 'profile-mode' : 'friends-mode'}
+          `}
+          content={
+            {
+              type: showProfile ? 'profile' : 'friends',
+              user: user,
+              onFriendSelect: handleFriendSelect,
+              onProfileToggle: handleProfileToggle,
+            }
+          }
           user={user}
           flipProgress={flipDirection === 'backward' ? flipProgress : 0}
           onPointerDown={(e) => startDrag(e, 'backward')}
