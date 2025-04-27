@@ -77,7 +77,7 @@ export default function FriendsList({ user, onFriendSelect, onProfileToggle }) {
         <div className="friends-list-container">
             <button
                 className="profile-toggle-button"
-                onClick={onProfileToggle}
+                onClick={() => onProfileToggle()}
                 aria-label="Toggle profile view"
             >
                 <FaUserCircle size={24}/>
