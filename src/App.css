@@ -7,6 +7,21 @@
   pointer-events: none;
 }
 
+body, #root {
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body {
+  font-size: clamp(16px, 2vw, 18px);
+}
+
+.container {
+  padding: 1rem;
+  max-width: 100%;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
     animation: App-logo-spin infinite 20s linear;

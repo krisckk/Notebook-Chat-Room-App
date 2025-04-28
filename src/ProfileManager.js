@@ -7,7 +7,10 @@ export default function ProfileManager({ user }) {
     const [profile, setProfile] = useState({
         displayName: '',
         bio: '',
-        photoDataUrl: ''     // <-- store Data URL here
+        photoDataUrl: '',
+        email: '',
+        phone: '',
+        address: ''
     });
     const [file, setFile]       = useState(null);
     const [preview, setPreview] = useState(''); // to show immediate preview
@@ -24,7 +27,10 @@ export default function ProfileManager({ user }) {
             ...prev,
             displayName: data.displayName || '',
             bio:         data.bio         || '',
-            photoDataUrl:data.photoDataUrl|| ''
+            photoDataUrl:data.photoDataUrl|| '',
+            email:       data.email      || '',
+            phone:       data.phone      || '',
+            address:     data.address     || ''
             }));
             setPreview(data.photoDataUrl || '');
         }

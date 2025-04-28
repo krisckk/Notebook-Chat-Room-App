@@ -1,3 +1,22 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-size: 100%;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+img, video, iframe {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
 .chatroom {
   display: flex;
   flex-direction: column;

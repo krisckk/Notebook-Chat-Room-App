@@ -133,11 +133,12 @@ export default function Notebook({ user }) {
 
   return (
     <div className="notebook">
-      <div className="spiral">
+      {user && ! flippingFromSignIn && 
+        <div className="spiral">
         {Array.from({ length: 20 }).map((_, i) => (
           <div key={i} className="spiral-ring"></div>
         ))}
-      </div>
+      </div>}
 
       {/* Only show left page if signed in */}
       {user && !flippingFromSignIn && (

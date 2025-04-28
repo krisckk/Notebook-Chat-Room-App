@@ -42,6 +42,9 @@
     margin: 0;
     flex-grow: 1;
     overflow-y: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+   gap: 16px;
 }
 
 .friends-list li {

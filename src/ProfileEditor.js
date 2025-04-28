@@ -28,9 +28,12 @@ export default function ProfileEditor({ user, onReturn }){
                 if(docSnap.exists()){
                     const data = docSnap.data();
                     setProfile({
-                        displayName: data.displayName || user.displayName || '',
-                        bio: data.bio || '',
-                        photoDataUrl: data.photoDataUrl || ''
+                        displayName: data.displayName    || user.displayName || '',
+                        bio: data.bio                    || '',
+                        photoDataUrl: data.photoDataUrl  || '',
+                        email: data.email                || user.email || '',
+                        phone: data.phone                || '',
+                        address: data.address            || '',
                     });
                     setPreview(data.photoDataUrl || '');
                 }
@@ -38,12 +41,17 @@ export default function ProfileEditor({ user, onReturn }){
                     await setDoc(userRef, {
                         displayName: user.displayName || '',
                         email: user.email || '',
+                        phone: '',
+                        address: '',
                         createdAt: serverTimestamp(),
                     }, { merge: true });
                     setProfile({
                         displayName: user.displayName || '',
                         bio: '',
-                        photoDataUrl: ''
+                        photoDataUrl: '',
+                        email: user.email || '',
+                        phone: '',
+                        address: ''
                     });
                 }
             }
@@ -130,6 +138,9 @@ export default function ProfileEditor({ user, onReturn }){
                 displayName: profile.displayName,
                 bio: profile.bio,
                 photoDataUrl: profile.photoDataUrl,
+                email: profile.email,
+                phone: profile.phone,
+                address: profile.address,
                 updatedAt: serverTimestamp()
             }, { merge: true });
             setIsEditing(false);
@@ -200,7 +211,7 @@ export default function ProfileEditor({ user, onReturn }){
                         )}
                     </div>
                 </div>
-
+                {/*---Display Name Field ---*/}
                 <div className="profile-fields">
                     <div className="profile-field">
                         <label>Display Name</label>
@@ -215,7 +226,7 @@ export default function ProfileEditor({ user, onReturn }){
                             <div className="profile-value">{profile.displayName}</div>
                         )}
                     </div>
-
+                {/*---Bio Field ---*/}        
                 <div className="profile-field">
                     <label>Bio</label>
                     {isEditing ? (
@@ -229,6 +240,56 @@ export default function ProfileEditor({ user, onReturn }){
                     ) : (
                         <div className="profile-value bio-value">
                             {profile.bio || 'No bio yet'}
+                        </div>
+                    )}
+                </div>
+                {/*---Email Field ---*/}    
+                <div className="profile-field">
+                    <label>Email</label>
+                    {isEditing ? (
+                        <input
+                            type="email"
+                            value={profile.email}
+                            onChange={(e) => setProfile({...profile, email: e.target.value})}
+                            placeholder="you@example.com"
+                        />
+                    ) : (
+                        <div className="profile-value">
+                            {profile.email || 'No email provided'}
+                        </div>
+                    )}
+                </div>
+
+                {/*---Phone Number Field ---*/}
+                <div className="profile-field">
+                    <label>Phone Number</label>
+                    {isEditing ? (
+                        <input
+                            type="tel"
+                            value={profile.phone}
+                            onChange={(e) => setProfile({...profile, phone: e.target.value})}
+                            placeholder="Your phone number"
+                        />
+                    ) : (
+                        <div className="profile-value">
+                            {profile.phone || 'No phone number provided'}
+                        </div>
+                    )}
+                </div>
+
+                {/*---Address Field ---*/}
+                <div className="profile-field">
+                    <label>Address</label>
+                    {isEditing ? (
+                        <input
+                            type="text"
+                            value={profile.address}
+                            onChange={(e) => setProfile({...profile, address: e.target.value})}
+                            placeholder="Your home address"
+                        />
+                    ) : (
+                        <div className="profile-value">
+                            {profile.address || 'No address provided'}
                         </div>
                     )}
                 </div>

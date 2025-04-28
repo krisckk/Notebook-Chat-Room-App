@@ -52,8 +52,13 @@ export default function ChatRoom({ user, roomId, friend, flippingFromSignIn }) {
   };
 
   return (
-    <div className="chatroom">
-      <div className="messages">
+    <div className="chatroom" style={{ 
+      overflowY: "auto", 
+      flex: 1, 
+      maxHeight: "60vh",
+      padding: "10px" 
+    }}>
+      <div className="messages" >
         {messages.map((msg) => {
           const date = msg.timestamp?.toDate?.() || new Date();
           const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
