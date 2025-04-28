@@ -1,7 +1,9 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import Page from './Page';
 import pages from './pagesData';
 import './Notebook.css';
+import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { db } from './firebase';
 
 export default function Notebook({ user }) {
   const [currentPage, setCurrentPage] = useState(0);
@@ -35,9 +37,9 @@ export default function Notebook({ user }) {
     return sortedIds.join('-');
   }
 
-  const handleProfileToggle = () => {
-    setShowProfile(!showProfile);
-  };
+  const handleProfileToggle = useCallback(() => {
+    setShowProfile(prev => !prev);
+  }, []);
 
   useEffect(() => {
     if(user) {
@@ -46,6 +48,14 @@ export default function Notebook({ user }) {
         const spiral = document.querySelector('.spiral');
         if (spiral) spiral.classList.add('jiggle');
       }, 50);
+
+      // Correct document reference usage
+      const userRef = doc(db, 'users', user.uid);
+      setDoc(userRef, {
+        displayName: user.displayName,
+        email: user.email,
+        createdAt: serverTimestamp(),
+      }, { merge: true });
 
       let progress = 0;
       const duration = 1000; // 1s animation
@@ -143,14 +153,14 @@ export default function Notebook({ user }) {
               type: showProfile ? 'profile' : 'friends',
               user: user,
               onFriendSelect: handleFriendSelect,
-              onProfileToggle: handleProfileToggle,
-            }
-          }
+              onProfileToggle: handleProfileToggle
+            }}
           user={user}
           flipProgress={flipDirection === 'backward' ? flipProgress : 0}
           onPointerDown={(e) => startDrag(e, 'backward')}
           onPointerMove={handleDrag}
           onPointerUp={endDrag}
+          onProfileToggle={handleProfileToggle}
           onFriendSelect={handleFriendSelect}
         />
       )}

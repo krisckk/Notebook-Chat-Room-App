@@ -35,7 +35,7 @@
 }
 
 .page {
-  position: absolute;
+  position: relative;
   top: 0;
   width: 50%;
   height: 100%;
@@ -51,23 +51,33 @@
   transform-style: preserve-3d;
   backface-visibility: hidden;
   transition: transform 0.3s ease;
-  display: flex;
   flex-direction: column;
   padding: 30px;
   font-family: 'Georgia', serif;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .page.left {
   left: 0;
   transform-origin: right center;
-  border-right: none;
+  border-right: 1px solid #ccc;
+  width: 50%;
 }
 
 .page.right {
   right: 0;
   transform-origin: left center;
   border-left: none;
+  background-color: #fffdf5;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 24px,
+    #dcdcdc 25px
+  );
+  background-size: 100% 25px;
+  background-attachment: local;
 }
 
 @keyframes spiralJiggle {

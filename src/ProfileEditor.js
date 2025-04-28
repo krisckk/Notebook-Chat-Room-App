@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { FaArrowLeft, FaSave, FaEdit, FaCamera } from "react-icons/fa";
-import { doc, getDocs, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "./firebase";
 import "./ProfileEditor.css";
 
@@ -14,22 +14,44 @@ export default function ProfileEditor({ user, onReturn }){
     const [file, setFile] = useState(null);
     const [preview, setPreview] = useState('');
     const [saving, setSaving] = useState(false);
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
         if(!user) return;
 
         const loadProfile = async () => {
-            const docRef = doc(db, 'users', user.uid);
-            const docSnap = await getDocs(docRef);
+            try {
+                const userRef = doc(db, 'users', user.uid);
+                const docSnap = await getDoc(userRef);
 
-            if(docSnap.exists()){
-                const data = docSnap.data();
-                setProfile({
-                    displayName: data.displayName || user.displayName || '',
-                    bio: data.bio || '',
-                    photoDataUrl: data.photoDataUrl || ''
-                });
-                setPreview(data.photoDataUrl || '');
+                if(docSnap.exists()){
+                    const data = docSnap.data();
+                    setProfile({
+                        displayName: data.displayName || user.displayName || '',
+                        bio: data.bio || '',
+                        photoDataUrl: data.photoDataUrl || ''
+                    });
+                    setPreview(data.photoDataUrl || '');
+                }
+                else {
+                    await setDoc(userRef, {
+                        displayName: user.displayName || '',
+                        email: user.email || '',
+                        createdAt: serverTimestamp(),
+                    }, { merge: true });
+                    setProfile({
+                        displayName: user.displayName || '',
+                        bio: '',
+                        photoDataUrl: ''
+                    });
+                }
+            }
+            catch(error) {
+                console.error("Error loading profile:", error);
+            }
+            finally{
+                setLoading(false);
             }
         };
         loadProfile();
@@ -101,15 +123,15 @@ export default function ProfileEditor({ user, onReturn }){
         if (!user) return;
         
         setSaving(true);
-            const updates = {
-            displayName: profile.displayName,
-            bio: profile.bio,
-            photoDataUrl: profile.photoDataUrl,
-            updatedAt: serverTimestamp()
-        };
 
         try {
-            await setDoc(doc(db, 'users', user.uid), updates, { merge: true });
+            const userDocRef = doc(db, 'users', user.uid);
+            await setDoc(userDocRef, {
+                displayName: profile.displayName,
+                bio: profile.bio,
+                photoDataUrl: profile.photoDataUrl,
+                updatedAt: serverTimestamp()
+            }, { merge: true });
             setIsEditing(false);
         } 
         catch (err) {

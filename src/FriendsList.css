@@ -46,14 +46,17 @@
 }
 
 .add-friend-form {
-    display: flex;
-    gap: 10px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 5px;
     margin-bottom: 15px;
+    width: 100%;
 }
 
 .search-input-container {
     position: relative;
-    flex: 1;
+    display: flex;
+    align-items: center;
 }
 
 .search-input-container input {
@@ -68,13 +71,13 @@
 .search-icon {
     position: absolute;
     left: 8px;
-    top: 50%;
-    transform: translateY(-50%);
+
     color: #888;
 }
 
 .add-button {
     padding: 8px 16px;
+    white-space: nowrap;
     background: #4caf50;
     color: white;
     border: none;
@@ -183,5 +186,15 @@
 
     .friend-item {
         padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .add-friend-form {
+        grid-template-columns: 1fr;
+    }
+
+    .add-button {
+        width: 100%;
     }
 }

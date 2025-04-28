@@ -14,6 +14,7 @@ export default function FriendsList({ user, onFriendSelect, onProfileToggle }) {
     useEffect(() => {
         if(!user) return;
 
+        const q = query(friendsCollection);
         const unsub = onSnapshot(friendsCollection, (snapshot) =>{
             setFriends(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
         });

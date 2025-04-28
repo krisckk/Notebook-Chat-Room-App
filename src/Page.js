@@ -15,11 +15,9 @@ import { FaTrash } from 'react-icons/fa';
 import FriendsList from './FriendsList';
 import ProfileEditor from './ProfileEditor';
 import ChatRoom from './ChatRoom';
-import FriendsManager from './FriendsManager';
-import ProfileManager from './ProfileManager';
 import './Page.css';
 
-export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, currentFriend, onFriendSelect, ...handlers }) {
+export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, currentFriend, onFriendSelect, onProfileToggle, ...handlers }) {
   const rotation = side === 'right'
     ? -180 * flipProgress
     : 180 * flipProgress;
@@ -32,7 +30,7 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
           <FriendsList 
             user={user} 
             onFriendSelect={content.onFriendSelect}
-            onProfileClick={content.onProfileToggle} 
+            onProfileToggle={content.onProfileToggle} 
           />
         );
       case 'profile':
@@ -40,6 +38,7 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
           <ProfileEditor 
             user={user} 
             onProfileClick={content.onProfileToggle} 
+            onReturn={content.onProfileToggle}
           />
         );
       case 'chat':
@@ -68,7 +67,11 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
   return (
     <div
       className={`page ${side}`}
-      style={{ transform: `rotateY(${rotation}deg)` }}
+      style={{ 
+        transform: `rotateY(${rotation}deg)`, 
+        width: '100%',
+        height: '100%',
+      }}
       {...handlers}
     >
       {renderContent()}

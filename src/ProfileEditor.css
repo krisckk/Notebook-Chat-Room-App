@@ -3,14 +3,8 @@
     display: flex;
     flex-direction: column;
     padding: 20px;
-    background-color: #fffdf5;
-    background-image: repeating-linear-gradient(
-      to bottom,
-      transparent,
-      transparent 24px,
-      #dcdcdc 25px
-    );
     font-family: 'Georgia', serif;
+    box-sizing: border-box;
   }
   
   .profile-header {

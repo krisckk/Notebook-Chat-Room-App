@@ -10,6 +10,9 @@
     transparent 24px,
     #dcdcdc 25px
   );
+  background-size: 100% 25px; /* Ensure full width */
+  background-attachment: local; /* Makes lines scroll with content */
+  background-repeat: repeat-y; /* Repeat vertically only */
   border: 1px solid #ccc;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
   transform-style: preserve-3d;
@@ -20,6 +23,7 @@
   padding: 30px;
   font-family: 'Georgia', serif;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
   
@@ -37,7 +41,7 @@
 
 /* Notes styling (left page) */
 .note {
-  padding: 30px;
+  padding: 20px;
   white-space: pre-wrap;
   font-family: 'Georgia', serif;
   font-size: 18px;
