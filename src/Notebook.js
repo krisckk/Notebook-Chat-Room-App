@@ -163,6 +163,7 @@ export default function Notebook({ user }) {
           onPointerUp={endDrag}
           onProfileToggle={handleProfileToggle}
           onFriendSelect={handleFriendSelect}
+          
         />
       )}
       <Page

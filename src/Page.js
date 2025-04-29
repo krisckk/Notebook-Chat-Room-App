@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { auth, provider, db } from './firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import {
   collection,
   addDoc,
@@ -17,7 +17,11 @@ import ProfileEditor from './ProfileEditor';
 import ChatRoom from './ChatRoom';
 import './Page.css';
 
-export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, currentFriend, onFriendSelect, onProfileToggle, ...handlers }) {
+export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, currentFriend, onFriendSelect, onProfileToggle, onFlipToSignUp, ...handlers }) {
+  const [email, setEmail] = useState('');
+        const [password, setPassword] = useState('');
+        const [error, setError] = useState('');
+  
   const rotation = side === 'right'
     ? -180 * flipProgress
     : 180 * flipProgress;
@@ -51,13 +55,72 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
           />
         )
       case 'signin':
+
+        const handleEmailSignIn = async (e) => {
+          e.preventDefault();
+          setError('');
+          try {
+            await signInWithEmailAndPassword(auth, email, password);
+          } 
+          catch (err) {
+            setError(err.message);
+          }
+        };
+        const handleGoogle = async() => {
+          const provider = new GoogleAuthProvider();
+          try {
+            await signInWithPopup(auth, provider);
+          }
+          catch(err){
+            console.error(err);
+          }
+        }
         return (
           <div className="signin-page">
-            <h2>Welcome to the Notebook Chat</h2>
-            <button onClick={() => signInWithPopup(auth, provider)}>
-              Sign In with Google
-            </button>
-          </div>
+      <h2>Sign In</h2>
+      {error && <div className="error">{error}</div>}
+
+      {/* — Email/Password Form — */}
+      <form onSubmit={handleEmailSignIn} className="auth-form">
+        <label>
+          Email
+          <input
+            type="email"
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            required
+          />
+        </label>
+        <label>
+          Password
+          <input
+            type="password"
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            required
+          />
+        </label>
+        <button type="submit">Sign In with Email</button>
+      </form>
+
+      <hr />
+
+      {/* — Google Sign-In — */}
+      <button onClick={handleGoogle}>
+        Sign In with Google
+      </button>
+
+      {/* — Flip to “sign up” page — */}
+      <p>
+        Don’t have an account?{" "}
+        <button 
+          className="link-button" 
+          onClick={() => onFlipToSignUp()}  // or whatever callback Notebook.js uses
+        >
+          Sign up
+        </button>
+      </p>
+    </div>
         )
       default:
         return <div className="note">{content.content}</div>;
