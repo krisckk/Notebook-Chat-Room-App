@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { auth, provider, db } from './firebase';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import {
@@ -14,6 +14,8 @@ import {
 } from 'firebase/firestore';
 import { FaArrowLeft } from 'react-icons/fa';
 import FriendsList from './FriendsList';
+import GroupList from './GroupList';
+import GroupChat from './GroupChat';
 import ProfileEditor from './ProfileEditor';
 import ChatRoom from './ChatRoom';
 import './Page.css';
@@ -35,11 +37,39 @@ export default function Page ({
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+
+  // ─── Group Chat State ───
+  const [groups, setGroups] = useState([]);
+  const [currentGroup, setCurrentGroup] = useState(null);
   
   const rotation = side === 'right'
     ? -180 * flipProgress
     : 180 * flipProgress;
 
+  // Load groups for this user
+  useEffect(() => {
+    if (!user) return;
+    const colRef = collection(db, 'users', user.uid, 'groups');
+    const unsub = onSnapshot(colRef, snap => {
+      setGroups(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+    });
+    return unsub;
+  }, [user]);
+
+  const handleCreateGroup = async name => {
+    if(!user || !name.trim()) return;
+    await addDoc(
+      collection(db, 'users', user.uid, 'groups'),
+      {
+        name,
+        leader: user.uid,
+        members: [user.uid],
+        createdAt: serverTimestamp()
+      }
+    );
+  };
+
+  // ─── Auth Handlers ───
   const handleEmailsSignIn = async e => {
     e.preventDefault();
     setError('');
@@ -88,11 +118,18 @@ export default function Page ({
     switch (content.type) {
       case 'friends':
         return (
-          <FriendsList 
-            user={user} 
-            onFriendSelect={content.onFriendSelect}
-            onProfileToggle={content.onProfileToggle} 
-          />
+          <div className="friends-and-groups">
+            <FriendsList
+              user={user}
+              onFriendSelect={content.onFriendSelect}
+              onProfileToggle={content.onProfileToggle}
+            />
+            <GroupList
+              groups={groups}
+              onCreateGroup={handleCreateGroup}
+              onSelectGroup={setCurrentGroup}
+            />
+          </div>
         );
       case 'profile':
         return (
@@ -222,6 +259,16 @@ export default function Page ({
         )
       default:
         return <div className="note">{content.content}</div>;
+    }
+    // If a Group is selected, show the GroupChat component
+    if(currentGroup && side === 'right') {
+      return(
+        <GroupChat
+          group={currentGroup}
+          user={user}
+          onExit={() => setCurrentGroup(null)}
+        />
+      );
     }
   };
 

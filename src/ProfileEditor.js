@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { FaArrowLeft, FaSave, FaEdit, FaCamera } from "react-icons/fa";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { db } from "./firebase";
+import { db, auth } from "./firebase";
+import { updateProfile } from "firebase/auth";
 import "./ProfileEditor.css";
 
 export default function ProfileEditor({ user, onReturn }){
@@ -143,6 +144,17 @@ export default function ProfileEditor({ user, onReturn }){
                 address: profile.address,
                 updatedAt: serverTimestamp()
             }, { merge: true });
+
+            // Sync to Firebase Auth so user.displayName is updated
+            await updateProfile(user, {
+                displayName: profile.displayName,
+                bio: profile.bio,
+                photoDataUrl: profile.photoDataUrl,
+                email: profile.email,
+                phone: profile.phone,
+                address: profile.address,
+            });
+
             setIsEditing(false);
         } 
         catch (err) {
