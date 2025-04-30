@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { db } from './firebase';
 import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
-import { FaTrash } from 'react-icons/fa';
+import { FaPaperPlane } from 'react-icons/fa';
 import './ChatRoom.css';
 
 export default function ChatRoom({ user, roomId, friend, flippingFromSignIn }) {
@@ -68,10 +68,20 @@ export default function ChatRoom({ user, roomId, friend, flippingFromSignIn }) {
               <div className='bubble-header'>
                 <span className='sender'>{msg.sender}</span>
                 {msg.senderId === user?.uid && (
-                  <FaTrash
+                  <button
                     className="delete-icon"
                     onClick={() => handleDelete(msg.id)}
-                  />
+                    aria-label="Delete message"
+                  >
+                    <svg
+                      width="16" 
+                      height="16" 
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M3 6v18h18v-18h-18zm5 14c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm5 0c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm5 0c0 .552-.448 1-1 1s-1-.448-1-1v-10c0-.552.448-1 1-1s1 .448 1 1v10zm4-18v2h-20v-2h5.711c.9 0 1.631-1.099 1.631-2h5.315c0 .901.73 2 1.631 2h5.712z" />
+                    </svg>
+                  </button>
                 )}
               </div>
               <div className="text">{msg.text}</div>
@@ -88,7 +98,7 @@ export default function ChatRoom({ user, roomId, friend, flippingFromSignIn }) {
             onChange={(e) => setInput(e.target.value)}
             placeholder="Type a message..."
           />
-          <button type="submit">Send</button>
+          <button type="submit"><FaPaperPlane /></button>
         </form>
       )}
     </div>

@@ -170,17 +170,16 @@ export default function Notebook({ user }) {
       <Page
         side="right"
         content={
-          currentFriend 
-                        ? { 
-                            type: 'chat',
-                            roomId: generateRoomId(user.uid, currentFriend.id),
-                            friend: currentFriend 
-                          }
-                        : flippingFromSignIn
-                            ? pages[rightIndex]
-                            : user
-                                ? {type: 'signup'}
-                                : { type: 'signin' }
+          !user
+            ? { type: 'signin' } 
+            : flippingFromSignIn
+              ? { type: 'signup' }
+              : currentFriend
+                ? { type: 'chat', 
+                    roomId: generateRoomId(user.uid, currentFriend.id),
+                    friend: currentFriend 
+                  }
+                : pages[rightIndex]
         }        
         user={user}
         currentFriend={currentFriend}

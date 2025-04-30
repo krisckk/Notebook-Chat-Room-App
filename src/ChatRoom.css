@@ -1,8 +1,9 @@
 .chatroom {
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 10vh;
   padding: 20px;
+  box-sizing: border-box;
 }
   
 .messages {
@@ -41,12 +42,14 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
   margin-bottom: 6px;
 }
 
 .sender {
   font-weight: bold;
   font-size: 14px;
+  flex-grow: 1;
 }
 
 .text {
@@ -61,19 +64,38 @@
 }
 
 .delete-icon {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-left: 8px;
   cursor: pointer;
   color: #888;
-  transition: color 0.2s;
+  line-height: 1;
 }
 
 .delete-icon:hover {
   color: #e74c3c;
+  transform: scale(1.2);
+}
+
+/* SVG icon sizing */
+.delete-icon svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+  pointer-events: none; /* Ensures clicks hit the button, not SVG */
 }
 
 .input-box {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  margin-top: auto;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ddd;
+  position: sticky;
+  bottom: 0;
 }
 
 .input-box input {
@@ -88,6 +110,7 @@
 @media (max-width: 600px) {
   .chatroom {
     padding: 10px;
+    padding-bottom: 60px;
   }
   
   .bubble {
@@ -97,6 +120,7 @@
 
   .input-box {
     flex-direction: column;
+    padding: 8px;
   }
   .input-box input,
   .input-box button {

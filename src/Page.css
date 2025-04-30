@@ -118,6 +118,33 @@
   cursor: pointer;
 }
 
+.notebook-sheet {
+  position: relative;
+  max-width: 360px;
+  margin: 2rem auto;
+  padding: 2rem 1.5rem 1.5rem 3rem;
+  background-color: rgb(187, 186, 180, 0.8);
+  background-image:
+    /* ruled lines */
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 23px,
+      rgba(200,200,200,0.8) 24px
+    ),
+    /* left margin red stripe */
+    linear-gradient(
+      to right,
+      rgba(231, 76, 60, 0.7) 4px,
+      transparent 4px
+    );
+  background-size: 100% 24px, 100% 100%;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', Tahoma, sans-serif;
+}
+
 .signin-page {
   padding: 40px;
   text-align: center;
@@ -125,7 +152,11 @@
 }
 
 .signin-page h2 {
-  margin-bottom: 20px;
+  margin-top: 0;
+  font-family: 'Georgia', serif;
+  font-size: 1.5rem;
+  border-bottom: 1px dashed rgba(0,0,0,0.2);
+  padding-bottom: 0.5rem;
 }
 
 .signin-page button {
@@ -136,6 +167,74 @@
   border: none;
   border-radius: 10px;
   cursor: pointer;
+}
+
+.auth-form lable {
+  display: block;
+  margin: 1rem 0 0.5rem;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.5rem;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  background: transparent;
+  font-size: 1rem;
+  outline: none;
+}
+
+.auth-form input:focus {
+  border-bottom-color: #e74c3c;
+}
+
+.auth-form button,
+.signin-page > button,
+.signin-page .link-button {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.6rem 1.2rem;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.auth-form button:hover,
+.signin-page > button:hover,
+.signin-page .link-button:hover {
+  background: #c0392b;
+}
+/* tweak the HR */
+.signin-page hr {
+  border: none;
+  border-top: 1px dashed rgba(0,0,0,0.2);
+  margin: 1.5rem 0;
+}
+
+.back-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background: #4fa1d6;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  cursor: crosshair;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.back-button:hover {
+  background: #296677;
 }
 
 .page.slide-in {
@@ -196,16 +295,6 @@
   color: #666;
   text-align: right;
   margin-top: 4px;
-}
-
-.delete-icon {
-  cursor: pointer;
-  color: #888;
-  transition: color 0.2s;
-}
-
-.delete-icon:hover {
-  color: #e74c3c;
 }
 
 .sender {

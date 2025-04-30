@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { auth, provider, db } from './firebase';
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import {
   collection,
   addDoc,
@@ -9,15 +9,27 @@ import {
   query,
   orderBy,
   deleteDoc,
-  doc
+  doc,
+  setDoc
 } from 'firebase/firestore';
-import { FaTrash } from 'react-icons/fa';
+import { FaArrowLeft } from 'react-icons/fa';
 import FriendsList from './FriendsList';
 import ProfileEditor from './ProfileEditor';
 import ChatRoom from './ChatRoom';
 import './Page.css';
 
-export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, currentFriend, onFriendSelect, onProfileToggle, onToggleSignUp, ...handlers }) {
+export default function Page ({
+  side, 
+  content, 
+  flipProgress, 
+  flippingFromSignIn, 
+  user, 
+  currentFriend, 
+  onFriendSelect, 
+  onProfileToggle, 
+  onToggleSignUp, 
+  ...handlers 
+}) {
   const auth = getAuth();
   
   const [email, setEmail] = useState('');
@@ -27,6 +39,49 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
   const rotation = side === 'right'
     ? -180 * flipProgress
     : 180 * flipProgress;
+
+  const handleEmailsSignIn = async e => {
+    e.preventDefault();
+    setError('');
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+    } 
+    catch (error) {
+      setError(error.message);
+    }
+  };
+  
+  const handleGoogleSignIn = async () => {
+    const provider = new GoogleAuthProvider();
+    setError('');
+    try {
+      await signInWithPopup(auth, provider);
+    }
+    catch (error) {
+      setError(error.message);
+    }
+  };
+
+  const handleSignup = async e => {
+    e.preventDefault();
+    setError('');
+    try{
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      // Initialize user document in Firestore
+      await setDoc(
+        doc(db, 'users', cred.user.uid),
+        {
+          email: cred.user.email,
+          createdAt: serverTimestamp()
+        },
+        { merge: true }
+      );
+      onToggleSignUp(false);
+    }
+    catch (error) {
+      setError(error.message);
+    }
+  };
 
   const renderContent = () => {
     if (!content) return null;
@@ -56,8 +111,47 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
             flippingFromSignIn={flippingFromSignIn}
           />
         )
+      case 'signup':
+        return (
+          <div 
+            className='signup-page'
+            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}
+          >
+            <div className='notebook-sheet'>
+              <h2>Create Account</h2>
+              {error && <div className='error'>{error}</div>}
+              <form onSubmit={handleSignup} className='auth-form'>
+              <label>
+                  Email
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Password
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                  />
+                </label>
+                <button type="submit">Sign Up</button>
+              </form>
+              <button
+                className='back-button'
+                onClick={() => onToggleSignUp(false)}
+              >
+                <FaArrowLeft style={{ marginRight: '0.5rem' }} />
+                Back to Sign In
+              </button>
+            </div>
+          </div>
+        )
       case 'signin':
-
         const handleEmailSignIn = async (e) => {
           e.preventDefault();
           setError('');
@@ -79,50 +173,52 @@ export default function Page ({ side, content, flipProgress, flippingFromSignIn,
         }
         return (
           <div className="signin-page">
-      <h2>Sign In</h2>
-      {error && <div className="error">{error}</div>}
+            <div className='notebook-sheet'>
+            <h2>Sign In</h2>
+            {error && <div className="error">{error}</div>}
 
-      {/* — Email/Password Form — */}
-      <form onSubmit={handleEmailSignIn} className="auth-form">
-        <label>
-          Email
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-          />
-        </label>
-        <label>
-          Password
-          <input
-            type="password"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            required
-          />
-        </label>
-        <button type="submit">Sign In with Email</button>
-      </form>
+            {/* — Email/Password Form — */}
+            <form onSubmit={handleEmailSignIn} className="auth-form">
+              <label>
+                Email
+                <input
+                  type="email"
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  required
+                />
+              </label>
+              <label>
+                Password
+                <input
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  required
+                />
+              </label>
+              <button type="submit">Sign In with Email</button>
+            </form>
 
-      <hr />
+            <hr />
 
-      {/* — Google Sign-In — */}
-      <button onClick={handleGoogle}>
-        Sign In with Google
-      </button>
+            {/* — Google Sign-In — */}
+            <button onClick={handleGoogle}>
+              Sign In with Google
+            </button>
 
-      {/* — Flip to “sign up” page — */}
-      <p>
-        Don’t have an account?{" "}
-        <button 
-          className="link-button" 
-          onClick={() => onFlipToSignUp()}  // or whatever callback Notebook.js uses
-        >
-          Sign up
-        </button>
-      </p>
-    </div>
+            {/* — Flip to “sign up” page — */}
+            <p>
+              Don’t have an account?{" "}
+              <button 
+                className="link-button" 
+                onClick={() => onToggleSignUp(true)}  // or whatever callback Notebook.js uses
+              >
+                Sign up
+              </button>
+            </p>
+            </div>
+          </div>
         )
       default:
         return <div className="note">{content.content}</div>;

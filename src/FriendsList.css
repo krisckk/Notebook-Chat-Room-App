@@ -168,15 +168,26 @@
 }
 
 .delete-icon {
-    color: #aaa;
+    background: none;
+    border: none;
+    padding: 0;
+    margin-left: 8px;
     cursor: pointer;
-    padding: 8px;
-    transition: all 0.2s;
+    color: #888; /* Default gray */
+    line-height: 1; /* Prevents vertical misalignment */
 }
 
 .delete-icon:hover {
     color: #e74c3c;
-    transform: scale(1.2);
+    transform: scale(1.4);
+}
+
+/* SVG icon sizing */
+.delete-icon svg {
+    display: block;
+    width: 16px;
+    height: 16px;
+    pointer-events: none; /* Ensures clicks hit the button, not SVG */
 }
 
 /* Responsive adjustments */
