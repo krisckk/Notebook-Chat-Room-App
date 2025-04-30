@@ -4,6 +4,7 @@ import pages from './pagesData';
 import './Notebook.css';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
+import { type } from '@testing-library/user-event/dist/type';
 
 export default function Notebook({ user }) {
   const [currentPage, setCurrentPage] = useState(0);
@@ -178,7 +179,7 @@ export default function Notebook({ user }) {
                         : flippingFromSignIn
                             ? pages[rightIndex]
                             : user
-                                ? pages[rightIndex]
+                                ? {type: 'signup'}
                                 : { type: 'signin' }
         }        
         user={user}
@@ -188,6 +189,7 @@ export default function Notebook({ user }) {
         onPointerDown={(e) => user && startDrag(e, 'forward')}
         onPointerMove={handleDrag}
         onPointerUp={endDrag}
+        onToggleSignUp={val => setFlippingFromSignIn(val)}
       />
     </div>
   );

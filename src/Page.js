@@ -17,10 +17,12 @@ import ProfileEditor from './ProfileEditor';
 import ChatRoom from './ChatRoom';
 import './Page.css';
 
-export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, currentFriend, onFriendSelect, onProfileToggle, onFlipToSignUp, ...handlers }) {
+export default function Page ({ side, content, flipProgress, flippingFromSignIn, user, currentFriend, onFriendSelect, onProfileToggle, onToggleSignUp, ...handlers }) {
+  const auth = getAuth();
+  
   const [email, setEmail] = useState('');
-        const [password, setPassword] = useState('');
-        const [error, setError] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
   
   const rotation = side === 'right'
     ? -180 * flipProgress
