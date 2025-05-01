@@ -23,6 +23,15 @@ service cloud.firestore {
             match /friends/{friendId} {
                 allow read, create, delete: if request.auth.uid == userId;
             }
+
+            match /groups/{groupId} {
+                allow read, write, delete: if request.auth.uid == userId;
+            }
+
+            // ── optionally messages under root /groups/... if you move them there ──
+            match /groups/{groupId}/messages/{messageId} {
+                allow read, create: if request.auth.uid in resource.data.members;
+            }
         }
 
         // 2. Chat Rooms System
@@ -51,6 +60,12 @@ service cloud.firestore {
                     //isValidChatroom(roomId);
 
             }
+        }
+
+        match /groups/{groupId}/messages/{messageId} {
+            allow read, create: if request.auth.uid in get (
+                /databases/$(database)/documents/users/$(request.auth.uid)/groups/$(groupId)
+            ).data.member;
         }
     }
 }

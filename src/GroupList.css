@@ -1,90 +1,101 @@
 .group-list-container {
-    position: relative;
-    margin-top: 1rem;
-    padding: 1.5rem 1rem 1rem 2.5rem;   /* extra left padding for margin stripe */
-    background-color: rgba(253, 252, 245, 0.8);
-    background-image:
-      /* ruled lines */
-      repeating-linear-gradient(
-        to bottom,
-        transparent,
-        transparent 23px,
-        rgba(200,200,200,0.4) 24px
-      ),
-      /* left margin red stripe */
-      linear-gradient(
-        to right,
-        rgba(231, 76, 60, 0.5) 4px,
-        transparent 4px
-      );
-    background-size: 100% 24px, 100% 100%;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    font-family: 'Georgia', serif;
-  }
-  
-  .group-list-container h3 {
-    margin: 0 0 0.75rem;
-    font-size: 1.1rem;
-    border-bottom: 1px dashed rgba(0,0,0,0.2);
-    padding-bottom: 0.25rem;
-  }
-  
-  .group-create {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .group-create input {
-    flex: 1;
-    padding: 0.5rem;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid rgba(0,0,0,0.3);
-    outline: none;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .group-create input:focus {
-    border-bottom-color: rgba(231, 76, 60, 0.8);
-  }
-  
-  .group-add-button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.4rem 0.75rem;
-    background: rgba(231, 76, 60, 0.8);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-  }
-  
-  .group-add-button:hover {
-    background: rgba(192, 57, 43, 0.8);
-  }
-  
-  .group-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  
-  .group-item {
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    background: rgba(255,255,255,0.9);
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .group-item:hover {
-    background: rgba(240,240,240,0.9);
-  }
+  position: relative;
+  margin-top: 1rem;
+  padding: 1.5rem 1rem 1rem 2.5rem;   /* extra left padding for margin stripe */
+  background-color: rgba(253, 252, 245, 0.8);
+  background-image:
+    /* ruled lines */
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 23px,
+      rgba(200,200,200,0.4) 24px
+    ),
+    /* left margin red stripe */
+    linear-gradient(
+      to right,
+      rgba(231, 76, 60, 0.5) 4px,
+      transparent 4px
+    );
+  background-size: 100% 24px, 100% 100%;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  font-family: 'Georgia', serif;
+}
+
+.group-list-container h3 {
+  margin: 0 0 0.75rem;
+  font-size: 1.1rem;
+  border-bottom: 1px dashed rgba(0,0,0,0.2);
+  padding-bottom: 0.25rem;
+}
+
+.group-create {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.group-create input {
+  flex: 1;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  outline: none;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.group-create input:focus {
+  border-bottom-color: rgba(231, 76, 60, 0.8);
+}
+
+.group-add-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.75rem;
+  background: rgba(231, 76, 60, 0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.group-add-button:hover {
+  background: rgba(192, 57, 43, 0.8);
+}
+
+.group-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.group-item input {
+  width: 100%;
+  padding: 0.6rem 0.75rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  font-family: 'Georgia', serif;
+  font-size: 1rem;
+  transition: border-color 0.2s;
+}
+
+.group-item {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.group-item:hover {
+  background: rgba(240,240,240,0.9);
+}
   

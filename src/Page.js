@@ -6,9 +6,6 @@ import {
   addDoc,
   serverTimestamp,
   onSnapshot,
-  query,
-  orderBy,
-  deleteDoc,
   doc,
   setDoc
 } from 'firebase/firestore';
@@ -115,6 +112,12 @@ export default function Page ({
 
   const renderContent = () => {
     if (!content) return null;
+    // Right page group chat override
+    if (side === 'right' && currentGroup) {
+      return (
+        <GroupChat group={currentGroup} user={user} onExit={() => setCurrentGroup(null)} onClick={console.log("Clicked")} />
+      );
+    }  
     switch (content.type) {
       case 'friends':
         return (
@@ -125,9 +128,8 @@ export default function Page ({
               onProfileToggle={content.onProfileToggle}
             />
             <GroupList
-              groups={groups}
-              onCreateGroup={handleCreateGroup}
-              onSelectGroup={setCurrentGroup}
+              user={user}
+              onSelectGroup={g =>{console.log('Group clicked:', g); setCurrentGroup(g)}}
             />
           </div>
         );
@@ -259,16 +261,6 @@ export default function Page ({
         )
       default:
         return <div className="note">{content.content}</div>;
-    }
-    // If a Group is selected, show the GroupChat component
-    if(currentGroup && side === 'right') {
-      return(
-        <GroupChat
-          group={currentGroup}
-          user={user}
-          onExit={() => setCurrentGroup(null)}
-        />
-      );
     }
   };
 
