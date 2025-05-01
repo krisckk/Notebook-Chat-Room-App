@@ -139,6 +139,7 @@
 .member-dropdown {
   display: flex;
   align-items: center;
+  position: relative;
   gap: 0.5rem;
   margin: 1rem 0;
   padding: 0.5rem;
@@ -158,6 +159,47 @@
   background-size: 100% 24px, 100% 100%;
   border: 2px solid #ddd;
   border-radius: 6px;
+}
+
+/* ── Visible header that you click ── */
+.dropdown-header {
+  padding: 0.5rem 0.75rem;
+  background: rgba(255,255,255,0.9);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: 'Segoe UI', sans-serif;
+  user-select: none;
+}
+
+/* ── The list that appears below the header ── */
+.dropdown-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 150px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-top: 0.25rem;
+  z-index: 100;
+}
+
+/* ── Individual items ── */
+.dropdown-list li {
+  padding: 0.5rem;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* ── Hover state ── */
+.dropdown-list li:hover {
+  background: #f0f0f0;
 }
 
 .member-dropdown select {

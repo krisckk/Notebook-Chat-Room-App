@@ -48,32 +48,16 @@ export default function Page({
 
   // Load groups for this user
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      onSelectGroup(null);
+      return;
+    }
     const colRef = collection(db, 'users', user.uid, 'groups');
     const unsub = onSnapshot(colRef, snap => {
       setGroups(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
     return unsub;
-  }, [user]);
-
-  // Create a new group
-  const handleCreateGroup = async name => {
-    const trimmed = name.trim();
-    if (!trimmed || !user) return;
-    try {
-      await addDoc(
-        collection(db, 'users', user.uid, 'groups'),
-        {
-          name: trimmed,
-          leader:  user.uid,
-          members: [user.uid],
-          createdAt: serverTimestamp()
-        }
-      );
-    } catch (err) {
-      console.error('Failed to create group:', err);
-    }
-  };
+  }, [user, onSelectGroup]);
 
   // Auth handlers
   const handleEmailSignIn = async e => {
@@ -105,7 +89,6 @@ export default function Page({
         { email: cred.user.email, createdAt: serverTimestamp() },
         { merge: true }
       );
-      onToggleSignUp(false);
     } catch (err) {
       setError(err.message);
     }
@@ -137,7 +120,6 @@ export default function Page({
             <GroupList
               user={user}
               groups={groups}
-              onCreateGroup={handleCreateGroup}
               onSelectGroup={onSelectGroup}
             />
           </div>

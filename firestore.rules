@@ -1,71 +1,79 @@
+// firestore.rules
 rules_version = '2';
 service cloud.firestore {
-    match /databases/{database}/documents {
-        
-        function isValidChatroom(roomId) {
-            // Room ID must be in format "user1_uid_user2_uid" (sorted alphabetically)
-            let participants = roomId.split('-');
-            return participants.size() == 2
-                && request.auth.uid in participants
-        }
-
-        function getOtherParticipant(roomId) {
-            let participants = roomId.split('-');
-            return participants[0] == request.auth.uid ? participants[1] : participants[0];
-        }
-
-        // 1. User Profiles
-        match /users/{userId} {
-            allow read: if request.auth != null;
-            allow create, update, delete: if request.auth.uid == userId;
-            
-            // Friends subcollection
-            match /friends/{friendId} {
-                allow read, create, delete: if request.auth.uid == userId;
-            }
-
-            match /groups/{groupId} {
-                allow read, write, delete: if request.auth.uid == userId;
-            }
-
-            // ── optionally messages under root /groups/... if you move them there ──
-            match /groups/{groupId}/messages/{messageId} {
-                allow read, create: if request.auth.uid in resource.data.members;
-            }
-        }
-
-        // 2. Chat Rooms System
-        match /chatrooms/{roomId} {
-            allow read, write: if isValidChatroom(roomId);
-            
-            match /messages/{messageId} {
-                allow read: if isValidChatroom(roomId);
-
-                allow create: if
-                    // User is participants
-                    isValidChatroom(roomId) &&
-                    // Sender matches authenticated user 
-                    request.auth.uid == request.resource.data.senderId &&
-                    // Receiver is the other participant
-                    request.resource.data.receiverId == getOtherParticipant(roomId) &&
-                    // Valid message structure
-                    request.resource.data.text is string &&
-                    request.resource.data.timestamp is timestamp;
-                
-                allow delete: if
-                    request.auth.uid in roomId.split('-') &&
-                    request.auth.uid == resource.data.senderId &&
-                    isValidChatroom(roomId);
-                    //request.auth.uid == resource.data.senderId &&
-                    //isValidChatroom(roomId);
-
-            }
-        }
-
-        match /groups/{groupId}/messages/{messageId} {
-            allow read, create: if request.auth.uid in get (
-                /databases/$(database)/documents/users/$(request.auth.uid)/groups/$(groupId)
-            ).data.member;
-        }
+  match /databases/{database}/documents {
+    
+    // Helper: validate two-person chatroom ID
+    function isValidChatroom(roomId) {
+      let participants = roomId.split('-');
+      return participants.size() == 2
+          && request.auth.uid in participants;
     }
+    
+    // Helper: get the other UID in a two-person chatroom
+    function getOtherParticipant(roomId) {
+      let participants = roomId.split('-');
+      return participants[0] == request.auth.uid
+        ? participants[1]
+        : participants[0];
+    }
+    
+    // ── User namespace ──
+    match /users/{userId} {
+      // Any authenticated user can read any profile
+      allow read: if request.auth != null;
+      // Only the user themself may create/update/delete their own doc
+      allow create, update, delete: if request.auth.uid == userId;
+      
+      // ── Friends ──
+      match /friends/{friendId} {
+        allow read, create, delete: if request.auth.uid == userId;
+      }
+      
+      // ── Groups ──
+      match /groups/{groupId} {
+        // Only the owner can create a new group
+        allow create: if request.auth.uid == userId;
+        // Owner or any listed member may read, update, delete
+        allow read, update, delete:
+          if request.auth.uid == userId
+          || request.auth.uid in resource.data.members;
+      }
+      
+      // ── Group messages ──
+      match /groups/{groupId}/messages/{messageId} {
+        // Any member of that group may read or post messages
+        allow read, create:
+          if request.auth.uid in
+            get(/databases/$(database)/documents/users/$(userId)/groups/$(groupId))
+              .data.members;
+      }
+    }
+    
+    // ── Two-person chatrooms ──
+    match /chatrooms/{roomId} {
+      // Both participants can read/write in the chatroom root
+      allow read, write: if isValidChatroom(roomId);
+      
+      match /messages/{messageId} {
+        // Both can read messages
+        allow read: if isValidChatroom(roomId);
+        
+        // Only the sender may create their own message,
+        // and must specify the correct receiverId, text, timestamp
+        allow create: if
+          isValidChatroom(roomId)
+          && request.auth.uid == request.resource.data.senderId
+          && request.resource.data.receiverId == getOtherParticipant(roomId)
+          && request.resource.data.text is string
+          && request.resource.data.timestamp is timestamp;
+        
+        // Only the sender may delete their own message
+        allow delete: if
+          isValidChatroom(roomId)
+          && request.auth.uid == resource.data.senderId;
+      }
+    }
+    
+  }
 }

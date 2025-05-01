@@ -4,8 +4,11 @@ import { db } from "./firebase";
 import {
     collection,
     addDoc,
+    setDoc,
+    doc,
     serverTimestamp,
     onSnapshot,
+    getDocs
 } from 'firebase/firestore';
 import './GroupList.css';
 
@@ -44,15 +47,39 @@ export default function GroupList({ user, onSelectGroup }) {
         const trimmed = name.trim();
         if (!trimmed || !user) return;
         try {
-            await addDoc(
+            // gather all your friend IDs
+            const friendsSnap = await getDocs(collection(db, 'users', user.uid, 'friends'));
+            const memberIds = friendsSnap.docs.map(d => d.id);
+            // include yourself
+            memberIds.push(user.uid);
+            // write the group with ful members list
+            const groupRef = await addDoc (
                 collection(db, 'users', user.uid, 'groups'),
                 {
-                name: trimmed,
-                leader:  user.uid,
-                members: [user.uid],
-                createdAt: serverTimestamp()
+                    name: trimmed,
+                    leader: user.uid,
+                    members: memberIds,
+                    createdAt: serverTimestamp()
                 }
             );
+            // mirror that same doc under every member's path
+            // so they'll all see it in their own GroupList
+            const batch = [];
+            memberIds.forEach(memberUid => {
+                batch.push(
+                    setDoc(
+                        doc(db, 'users', memberUid, 'groups', groupRef.id),
+                        {
+                            name: trimmed,
+                            leader: user.uid,
+                            members: memberIds,
+                            createdAt: groupRef._key.path.segments.slice(-1)[0]
+                        },
+                        { merge: true }
+                    )
+                );
+            });
+            await Promise.all(batch);
             console.log('Group created:', trimmed);
         } catch (err) {
         console.error('Failed to create group:', err);

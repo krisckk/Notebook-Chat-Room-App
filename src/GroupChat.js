@@ -1,3 +1,4 @@
+// src/GroupChat.js
 import React, { useState, useEffect } from 'react';
 import {
   collection,
@@ -6,13 +7,10 @@ import {
   onSnapshot,
   getDocs,
   addDoc,
-  updateDoc,
-  arrayUnion,
-  doc,
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { FaUserPlus, FaTimes, FaChevronDown } from 'react-icons/fa';
+import { FaTimes } from 'react-icons/fa';
 import './GroupChat.css';
 
 export default function GroupChat({ group, user, onExit }) {
@@ -38,30 +36,29 @@ export default function GroupChat({ group, user, onExit }) {
     const path = collection(db, 'users', group.leader, 'groups', group.id, 'messages');
     const q = query(path, orderBy('timestamp', 'asc'));
     const unsub = onSnapshot(q, snap => {
-      setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));  
+      setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
     });
     return unsub;
   }, [group]);
 
   const handleSend = async e => {
     e.preventDefault();
-    if (!input.trim()) return;
-    await addDoc(
-      collection(db, 'users', group.leader, 'groups', group.id, 'messages'),
-      { text: input, senderId: user.uid, timestamp: serverTimestamp() }
-    );
-    setInput('');
-  };
-
-  const handleAddMember = async () => {
-    if (!selectedFriend) return;
-    const groupRef = doc(db, 'users', group.leader, 'groups', group.id);
-    await updateDoc(groupRef, {
-      members: arrayUnion(selectedFriend)
-    });
-    setSelectedFriend('');
-    setShowAdd(false);
-    setShowList(false);
+    if (!input.trim() || !user) return;
+    try {
+      await addDoc(
+        collection(db, 'users', group.leader, 'groups', group.id, 'messages'),
+        {
+          text: input,
+          senderId: user.uid,
+          senderName: user.displayName || user.email || 'Unknown',
+          timestamp: serverTimestamp()
+        }
+      );
+      setInput('');
+    } 
+    catch (err) {
+      console.error('Send failed:', err);
+    }
   };
 
   return (
@@ -73,46 +70,20 @@ export default function GroupChat({ group, user, onExit }) {
         <h2>{group.name}</h2>
       </header>
 
-      <button className="add-member-btn" onClick={() => setShowAdd(!showAdd)}>
-        <FaUserPlus /> Add Member
-      </button>
-
-      {showAdd && (
-        <div className="member-dropdown">
-          <div className="dropdown-header" onClick={() => setShowList(!showList)}>
-            {selectedFriend
-              ? friends.find(f => f.id === selectedFriend)?.displayName
-              : 'Select friend'}
-            <FaChevronDown style={{ marginLeft: '0.5rem' }} />
-          </div>
-          {showList && (
-            <ul className="dropdown-list">
-              {friends.map(f => (
-                <li
-                  key={f.id}
-                  onClick={() => setSelectedFriend(f.id)}
-                >
-                  {f.displayName}
-                </li>
-              ))}
-            </ul>
-          )}
-          <button
-            className="confirm-add-btn"
-            onClick={handleAddMember}
-            disabled={!selectedFriend}
-          >
-            Add
-          </button>
-        </div>
-      )}
-
       <div className="messages">
-        {messages.map(m => (
-          <div key={m.id} className={`bubble ${m.senderId === user.uid ? 'self' : 'other'}`}>
-            {m.text}
-          </div>
-        ))}
+        {messages.map(m => {
+          const date = m.timestamp?.toDate?.() || new Date();
+          const timeString = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+          return (
+            <div key={m.id} className={`bubble ${m.senderId === user?.uid ? 'self' : 'other'}`}>
+              <div className="bubble-header">
+                <span className="sender-name">{m.senderName}</span>
+                <span className="timestamp">{timeString}</span>
+              </div>
+              <div className="bubble-text">{m.text}</div>
+            </div>
+          );
+        })}
       </div>
 
       <form className="input-box" onSubmit={handleSend}>
