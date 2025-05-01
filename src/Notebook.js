@@ -167,21 +167,19 @@ export default function Notebook({ user }) {
           onFriendSelect={handleFriendSelect}
           currentGroup={currentGroup}
           onSelectGroup={setCurrentGroup}
+          onToggleSignUp={setFlippingFromSignIn}
         />
       )}
       <Page
         side="right"
         content={
-          !user
-            ? { type: 'signin' } 
-            : flippingFromSignIn
-              ? { type: 'signup' }
-              : currentFriend
-                ? { type: 'chat', 
-                    roomId: generateRoomId(user.uid, currentFriend.id),
-                    friend: currentFriend 
-                  }
-                : pages[rightIndex]
+          currentFriend
+          ? { type: 'chat', roomId: generateRoomId(user.uid, currentFriend.id), friend: currentFriend }
+          : flippingFromSignIn
+            ? { type: 'signup' }                   // ← show sign-up
+            : user
+              ? { type: pages[rightIndex] }
+              : { type: 'signin' }
         }        
         user={user}
         currentFriend={currentFriend}
@@ -190,7 +188,7 @@ export default function Notebook({ user }) {
         onPointerDown={(e) => user && startDrag(e, 'forward')}
         onPointerMove={handleDrag}
         onPointerUp={endDrag}
-        onToggleSignUp={val => setFlippingFromSignIn(val)}
+        onToggleSignUp={setFlippingFromSignIn}
         currentGroup={currentGroup}
         onSelectGroup={setCurrentGroup}
       />

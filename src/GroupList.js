@@ -1,19 +1,21 @@
+// src/GroupList.js
 import React, { useState, useEffect } from "react";
-import { FaPlus } from "react-icons/fa";
+import { FaPlus, FaTrash } from "react-icons/fa";
 import { db } from "./firebase";
 import {
     collection,
     addDoc,
-    setDoc,
-    doc,
     serverTimestamp,
     onSnapshot,
-    getDocs
+    getDocs,
+    doc,
+    setDoc,
+    deleteDoc
 } from 'firebase/firestore';
 import './GroupList.css';
 
 export default function GroupList({ user, onSelectGroup }) {
-    const [groups, setGroups]       = useState([]);
+    const [groups, setGroups] = useState([]);
     const [newEntries, setNewEntries] = useState([]);
 
     // Subscribe to existing groups
@@ -29,62 +31,78 @@ export default function GroupList({ user, onSelectGroup }) {
     // Add a placeholder entry for new group name
     const handleAddClick = () => {
         setNewEntries(entries => [
-        { tempId: Date.now().toString(), name: '' },
-        ...entries
+            { tempId: Date.now().toString(), name: '' },
+            ...entries
         ]);
     };
 
     // Update just-typed name
     const updateEntry = (tempId, name) => {
         setNewEntries(entries =>
-        entries.map(e => e.tempId === tempId ? { ...e, name } : e)
+            entries.map(e => e.tempId === tempId ? { ...e, name } : e)
         );
     };
 
-    // Commit new group to Firestore    
+    // Commit new group to Firestore and mirror to all members
     const commitEntry = async (tempId, name) => {
         setNewEntries(entries => entries.filter(e => e.tempId !== tempId));
         const trimmed = name.trim();
         if (!trimmed || !user) return;
+
         try {
-            // gather all your friend IDs
+            // 1) gather all your friend UIDs from the friend records
             const friendsSnap = await getDocs(collection(db, 'users', user.uid, 'friends'));
-            const memberIds = friendsSnap.docs.map(d => d.id);
+            // Each friend doc stores the actual friend's uid in its 'id' field
+            const memberIds = friendsSnap.docs.map(d => d.data().id);
             // include yourself
             memberIds.push(user.uid);
-            // write the group with ful members list
-            const groupRef = await addDoc (
+
+            // 2) write the group under your own namespace
+            const groupDoc = await addDoc(
                 collection(db, 'users', user.uid, 'groups'),
                 {
-                    name: trimmed,
-                    leader: user.uid,
-                    members: memberIds,
+                    name:      trimmed,
+                    leader:    user.uid,
+                    members:   memberIds,
                     createdAt: serverTimestamp()
                 }
             );
-            // mirror that same doc under every member's path
-            // so they'll all see it in their own GroupList
-            const batch = [];
-            memberIds.forEach(memberUid => {
-                batch.push(
-                    setDoc(
-                        doc(db, 'users', memberUid, 'groups', groupRef.id),
-                        {
-                            name: trimmed,
-                            leader: user.uid,
-                            members: memberIds,
-                            createdAt: groupRef._key.path.segments.slice(-1)[0]
-                        },
-                        { merge: true }
-                    )
-                );
-            });
-            await Promise.all(batch);
-            console.log('Group created:', trimmed);
-        } catch (err) {
-        console.error('Failed to create group:', err);
+
+            // 3) mirror that doc under each member's path
+            await Promise.all(memberIds.map(memberUid =>
+                setDoc(
+                    doc(db, 'users', memberUid, 'groups', groupDoc.id),
+                    {
+                        name:      trimmed,
+                        leader:    user.uid,
+                        members:   memberIds,
+                        createdAt: serverTimestamp()
+                    },
+                    { merge: true }
+                )
+            ));
+
+            console.log('Group created and mirrored to members:', trimmed);
+        } 
+        catch (err) {
+            console.error('Failed to create group:', err);
         }
     };
+
+    const handleDeleteGroup = async group => {
+        try {
+            // remove the group doc from each member
+            await Promise.all(
+                group.members.map(uid => 
+                    doc(db, 'users', uid, 'groups', group.id)
+                ).map(path => deleteDoc(path))
+            );
+            console.log("🗑️ Group deleted:", group.name);
+        }
+        catch(err) {
+            console.error("❌ Failed to delete group:", err);
+        }
+    }
 
     return (
         <div className="group-list-container">
@@ -94,29 +112,29 @@ export default function GroupList({ user, onSelectGroup }) {
             </button>
             <ul className="group-list">
                 {newEntries.map(entry => (
-                <li key={entry.tempId} className="group-item">
-                    <input
-                    autoFocus
-                    value={entry.name}
-                    onChange={e => updateEntry(entry.tempId, e.target.value)}
-                    onBlur={e => commitEntry(entry.tempId, e.target.value)}
-                    onKeyDown={e => {
-                        if (e.key === 'Enter') {
-                        commitEntry(entry.tempId, entry.name);
-                        }
-                    }}
-                    placeholder="Enter group name"
-                    />
-                </li>
+                    <li key={entry.tempId} className="group-item">
+                        <input
+                            autoFocus
+                            value={entry.name}
+                            onChange={e => updateEntry(entry.tempId, e.target.value)}
+                            onBlur={e => commitEntry(entry.tempId, e.target.value)}
+                            onKeyDown={e => {
+                                if (e.key === 'Enter') commitEntry(entry.tempId, entry.name);
+                            }}
+                            placeholder="Enter group name"
+                        />
+                    </li>
                 ))}
                 {groups.map(group => (
-                <li
-                    key={group.id}
-                    className="group-item"
-                    onClick={() => onSelectGroup(group)}
-                >
-                    {group.name}
-                </li>
+                    <li key={group.id} className="group-item">
+                        <span onClick={() => onSelectGroup(group)}>
+                           {group.name}
+                        </span>
+                        <FaTrash
+                            className="group-delete-icon"
+                            onClick={() => handleDeleteGroup(group)}
+                        />
+                  </li>
                 ))}
             </ul>
         </div>

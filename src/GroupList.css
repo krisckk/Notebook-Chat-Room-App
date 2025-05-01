@@ -99,3 +99,12 @@
   background: rgba(240,240,240,0.9);
 }
   
+.group-delete-icon {
+  margin-left: 0.5rem;
+  cursor: pointer;
+  color: #888;
+}
+
+.group-delete-icon:hover {
+  color: #e74c3c;
+}

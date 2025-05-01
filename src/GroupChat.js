@@ -7,10 +7,11 @@ import {
   onSnapshot,
   getDocs,
   addDoc,
+  deleteDoc,
   serverTimestamp
 } from 'firebase/firestore';
 import { db } from './firebase';
-import { FaTimes } from 'react-icons/fa';
+import { FaTimes, FaTrash } from 'react-icons/fa';
 import './GroupChat.css';
 
 export default function GroupChat({ group, user, onExit }) {
