@@ -10,7 +10,6 @@ import {
 import './GroupList.css';
 
 export default function GroupList({ user, onSelectGroup }) {
-    const [newGroupName, setNewGroupName] = useState('');
     const [groups, setGroups]       = useState([]);
     const [newEntries, setNewEntries] = useState([]);
 
@@ -19,7 +18,7 @@ export default function GroupList({ user, onSelectGroup }) {
         if (!user) return;
         const colRef = collection(db, 'users', user.uid, 'groups');
         const unsub = onSnapshot(colRef, snap => {
-        setGroups(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+            setGroups(snap.docs.map(d => ({ id: d.id, ...d.data() })));
         });
         return unsub;
     }, [user]);
@@ -39,7 +38,7 @@ export default function GroupList({ user, onSelectGroup }) {
         );
     };
 
-    // Commit new group to Firestore
+    // Commit new group to Firestore    
     const commitEntry = async (tempId, name) => {
         setNewEntries(entries => entries.filter(e => e.tempId !== tempId));
         const trimmed = name.trim();

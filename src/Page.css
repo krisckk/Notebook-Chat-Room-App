@@ -245,6 +245,18 @@
   animation: slideOutToLeft 1s ease-out;
 }
 
+/* Layout for friends + groups */
+.friends-and-groups {
+  display: flex;
+  gap: 1rem;
+  height: 100%;
+}
+
+/* Each panel takes half width on larger screens */
+.friends-and-groups > * {
+  flex: 1 1 50%;
+}
+
 @keyframes slideInFromLeft {
   0% {
     opaccity: 0;
@@ -268,6 +280,12 @@
 }
 
 @media (max-width: 600px) {
+  .friends-and-groups {
+    flex-direction: column;
+  }
+  .friends-and-groups > * {
+    flex: none;
+  }
   .page {
     width: 100%;
     position: relative;  

@@ -16,6 +16,7 @@ export default function Notebook({ user }) {
   const [flippingFromSignIn, setFlippingFromSignIn] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [currentFriend, setCurrentFriend] = useState(null);
+  const [currentGroup, setCurrentGroup] = useState(null);
   const startXRef = useRef(0);
 
   const handleFriendSelect = (friend) => {
@@ -164,7 +165,8 @@ export default function Notebook({ user }) {
           onPointerUp={endDrag}
           onProfileToggle={handleProfileToggle}
           onFriendSelect={handleFriendSelect}
-          
+          currentGroup={currentGroup}
+          onSelectGroup={setCurrentGroup}
         />
       )}
       <Page
@@ -189,6 +191,8 @@ export default function Notebook({ user }) {
         onPointerMove={handleDrag}
         onPointerUp={endDrag}
         onToggleSignUp={val => setFlippingFromSignIn(val)}
+        currentGroup={currentGroup}
+        onSelectGroup={setCurrentGroup}
       />
     </div>
   );

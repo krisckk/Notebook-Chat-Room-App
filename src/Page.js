@@ -1,14 +1,21 @@
+// src/Page.js
 import React, { useEffect, useState } from 'react';
-import { auth, provider, db } from './firebase';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
 import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup
+} from 'firebase/auth';
+import {
+  doc,
+  setDoc,
   collection,
   addDoc,
   serverTimestamp,
-  onSnapshot,
-  doc,
-  setDoc
+  onSnapshot
 } from 'firebase/firestore';
+import { db } from './firebase';
 import { FaArrowLeft } from 'react-icons/fa';
 import FriendsList from './FriendsList';
 import GroupList from './GroupList';
@@ -17,31 +24,27 @@ import ProfileEditor from './ProfileEditor';
 import ChatRoom from './ChatRoom';
 import './Page.css';
 
-export default function Page ({
-  side, 
-  content, 
-  flipProgress, 
-  flippingFromSignIn, 
-  user, 
-  currentFriend, 
-  onFriendSelect, 
-  onProfileToggle, 
-  onToggleSignUp, 
-  ...handlers 
+export default function Page({
+  side,
+  content,
+  flipProgress,
+  flippingFromSignIn,
+  user,
+  currentFriend,
+  currentGroup,
+  onFriendSelect,
+  onProfileToggle,
+  onToggleSignUp,
+  onSelectGroup,
+  ...handlers
 }) {
   const auth = getAuth();
-  
-  const [email, setEmail] = useState('');
+  const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError]       = useState('');
 
-  // ─── Group Chat State ───
+  // Group list state
   const [groups, setGroups] = useState([]);
-  const [currentGroup, setCurrentGroup] = useState(null);
-  
-  const rotation = side === 'right'
-    ? -180 * flipProgress
-    : 180 * flipProgress;
 
   // Load groups for this user
   useEffect(() => {
@@ -53,71 +56,75 @@ export default function Page ({
     return unsub;
   }, [user]);
 
+  // Create a new group
   const handleCreateGroup = async name => {
-    if(!user || !name.trim()) return;
-    await addDoc(
-      collection(db, 'users', user.uid, 'groups'),
-      {
-        name,
-        leader: user.uid,
-        members: [user.uid],
-        createdAt: serverTimestamp()
-      }
-    );
+    const trimmed = name.trim();
+    if (!trimmed || !user) return;
+    try {
+      await addDoc(
+        collection(db, 'users', user.uid, 'groups'),
+        {
+          name: trimmed,
+          leader:  user.uid,
+          members: [user.uid],
+          createdAt: serverTimestamp()
+        }
+      );
+    } catch (err) {
+      console.error('Failed to create group:', err);
+    }
   };
 
-  // ─── Auth Handlers ───
-  const handleEmailsSignIn = async e => {
+  // Auth handlers
+  const handleEmailSignIn = async e => {
     e.preventDefault();
     setError('');
     try {
       await signInWithEmailAndPassword(auth, email, password);
-    } 
-    catch (error) {
-      setError(error.message);
+    } catch (err) {
+      setError(err.message);
     }
   };
-  
+
   const handleGoogleSignIn = async () => {
-    const provider = new GoogleAuthProvider();
     setError('');
     try {
-      await signInWithPopup(auth, provider);
-    }
-    catch (error) {
-      setError(error.message);
+      await signInWithPopup(auth, new GoogleAuthProvider());
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   const handleSignup = async e => {
     e.preventDefault();
     setError('');
-    try{
+    try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
-      // Initialize user document in Firestore
       await setDoc(
         doc(db, 'users', cred.user.uid),
-        {
-          email: cred.user.email,
-          createdAt: serverTimestamp()
-        },
+        { email: cred.user.email, createdAt: serverTimestamp() },
         { merge: true }
       );
       onToggleSignUp(false);
-    }
-    catch (error) {
-      setError(error.message);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
+  // Render content
   const renderContent = () => {
-    if (!content) return null;
-    // Right page group chat override
+    // Right-hand Group Chat override
     if (side === 'right' && currentGroup) {
       return (
-        <GroupChat group={currentGroup} user={user} onExit={() => setCurrentGroup(null)} onClick={console.log("Clicked")} />
+        <GroupChat
+          group={currentGroup}
+          user={user}
+          onExit={() => onSelectGroup(null)}
+        />
       );
-    }  
+    }
+
+    if (!content) return null;
     switch (content.type) {
       case 'friends':
         return (
@@ -129,38 +136,39 @@ export default function Page ({
             />
             <GroupList
               user={user}
-              onSelectGroup={g =>{console.log('Group clicked:', g); setCurrentGroup(g)}}
+              groups={groups}
+              onCreateGroup={handleCreateGroup}
+              onSelectGroup={onSelectGroup}
             />
           </div>
         );
+
       case 'profile':
         return (
-          <ProfileEditor 
-            user={user} 
-            onProfileClick={content.onProfileToggle} 
+          <ProfileEditor
+            user={user}
             onReturn={content.onProfileToggle}
           />
         );
+
       case 'chat':
         return (
-          <ChatRoom 
-            user={user} 
-            friend={content.friend} 
-            roomId={content.roomId}  
+          <ChatRoom
+            user={user}
+            friend={content.friend}
+            roomId={content.roomId}
             flippingFromSignIn={flippingFromSignIn}
           />
-        )
+        );
+
       case 'signup':
         return (
-          <div 
-            className='signup-page'
-            style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%', width: '100%' }}
-          >
-            <div className='notebook-sheet'>
+          <div className="signup-page" style={{ display:'flex',justifyContent:'center',alignItems:'center',height:'100%',width:'100%' }}>
+            <div className="notebook-sheet">
               <h2>Create Account</h2>
-              {error && <div className='error'>{error}</div>}
-              <form onSubmit={handleSignup} className='auth-form'>
-              <label>
+              {error && <div className="error">{error}</div>}
+              <form onSubmit={handleSignup} className="auth-form">
+                <label>
                   Email
                   <input
                     type="email"
@@ -180,101 +188,69 @@ export default function Page ({
                 </label>
                 <button type="submit">Sign Up</button>
               </form>
-              <button
-                className='back-button'
-                onClick={() => onToggleSignUp(false)}
-              >
-                <FaArrowLeft style={{ marginRight: '0.5rem' }} />
+              <button className="back-button" onClick={() => onToggleSignUp(false)}>
+                <FaArrowLeft style={{ marginRight:'0.5rem' }} />
                 Back to Sign In
               </button>
             </div>
           </div>
-        )
+        );
+
       case 'signin':
-        const handleEmailSignIn = async (e) => {
-          e.preventDefault();
-          setError('');
-          try {
-            await signInWithEmailAndPassword(auth, email, password);
-          } 
-          catch (err) {
-            setError(err.message);
-          }
-        };
-        const handleGoogle = async() => {
-          const provider = new GoogleAuthProvider();
-          try {
-            await signInWithPopup(auth, provider);
-          }
-          catch(err){
-            console.error(err);
-          }
-        }
         return (
           <div className="signin-page">
-            <div className='notebook-sheet'>
-            <h2>Sign In</h2>
-            {error && <div className="error">{error}</div>}
-
-            {/* — Email/Password Form — */}
-            <form onSubmit={handleEmailSignIn} className="auth-form">
-              <label>
-                Email
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  required
-                />
-              </label>
-              <label>
-                Password
-                <input
-                  type="password"
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  required
-                />
-              </label>
-              <button type="submit">Sign In with Email</button>
-            </form>
-
-            <hr />
-
-            {/* — Google Sign-In — */}
-            <button onClick={handleGoogle}>
-              Sign In with Google
-            </button>
-
-            {/* — Flip to “sign up” page — */}
-            <p>
-              Don’t have an account?{" "}
-              <button 
-                className="link-button" 
-                onClick={() => onToggleSignUp(true)}  // or whatever callback Notebook.js uses
-              >
-                Sign up
-              </button>
-            </p>
+            <div className="notebook-sheet">
+              <h2>Sign In</h2>
+              {error && <div className="error">{error}</div>}
+              <form onSubmit={handleEmailSignIn} className="auth-form">
+                <label>
+                  Email
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    required
+                  />
+                </label>
+                <label>
+                  Password
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={e => setPassword(e.target.value)}
+                    required
+                  />
+                </label>
+                <button type="submit">Sign In with Email</button>
+              </form>
+              <hr />
+              <button onClick={handleGoogleSignIn}>Sign In with Google</button>
+              <p>
+                Don’t have an account?{' '}
+                <button className="link-button" onClick={() => onToggleSignUp(true)}>
+                  Sign up
+                </button>
+              </p>
             </div>
           </div>
-        )
+        );
+
       default:
         return <div className="note">{content.content}</div>;
     }
   };
 
+  const rotation = side === 'right'
+    ? -180 * flipProgress
+    : 180 * flipProgress;
+
   return (
     <div
       className={`page ${side}`}
-      style={{ 
-        transform: `rotateY(${rotation}deg)`, 
-        width: '100%',
-        height: '100%',
-      }}
+      style={{ transform: `rotateY(${rotation}deg)`, width:'100%', height:'100%' }}
       {...handlers}
     >
       {renderContent()}
     </div>
   );
-};
+}

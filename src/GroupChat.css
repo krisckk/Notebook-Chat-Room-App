@@ -1,138 +1,189 @@
 .group-chat-container {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    padding: 2rem 1rem 1rem 2.5rem;
-    background-color: rgba(253, 252, 245, 0.8);
-    background-image:
-      repeating-linear-gradient(
-        to bottom,
-        transparent,
-        transparent 23px,
-        rgba(200,200,200,0.4) 24px
-      ),
-      linear-gradient(
-        to right,
-        rgba(231, 76, 60, 0.5) 4px,
-        transparent 4px
-      );
-    background-size: 100% 24px, 100% 100%;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.1);
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .group-chat-container h2 {
-    margin: 0 0 1rem;
-    font-family: 'Georgia', serif;
-    font-size: 1.3rem;
-    border-bottom: 1px dashed rgba(0,0,0,0.2);
-    padding-bottom: 0.5rem;
-  }
-  
-  .add-member-btn {
-    display: inline-flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    background: rgba(52,152,219,0.8);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .add-member-btn:hover {
-    background: rgba(41,128,185,0.8);
-  }
-  
-  .member-dropdown {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  
-  .member-dropdown select {
-    flex: 1;
-    padding: 0.5rem;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid rgba(0,0,0,0.3);
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .member-dropdown button {
-    padding: 0.5rem 1rem;
-    background: rgba(46,204,113,0.8);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .member-dropdown button:hover {
-    background: rgba(39,174,96,0.8);
-  }
-  
-  .messages {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding-right: 0.5rem;
-  }
-  
-  .bubble {
-    max-width: 70%;
-    padding: 0.75rem;
-    border-radius: 12px;
-    line-height: 1.4;
-    position: relative;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .bubble.self {
-    align-self: flex-end;
-    background: rgba(220,248,198,0.9);
-  }
-  
-  .bubble.other {
-    align-self: flex-start;
-    background: rgba(255,255,255,0.9);
-  }
-  
-  .input-box {
-    display: flex;
-    gap: 0.5rem;
-    padding-top: 1rem;
-    border-top: 1px dashed rgba(0,0,0,0.2);
-  }
-  
-  .input-box input {
-    flex: 1;
-    padding: 0.5rem;
-    background: transparent;
-    border: none;
-    border-bottom: 2px solid rgba(0,0,0,0.3);
-    outline: none;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .input-box button {
-    padding: 0.5rem 1rem;
-    background: rgba(52,152,219,0.8);
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-family: 'Segoe UI', sans-serif;
-  }
-  
-  .input-box button:hover {
-    background: rgba(41,128,185,0.8);
-  }
-  
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: 2rem 1rem 1rem 2.5rem;
+  background-color: rgba(253, 252, 245, 0.8);
+  background-image:
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 23px,
+      rgba(200,200,200,0.4) 24px
+    ),
+    linear-gradient(
+      to right,
+      rgba(231, 76, 60, 0.5) 4px,
+      transparent 4px
+    );
+  background-size: 100% 24px, 100% 100%;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.group-chat-container h2 {
+  margin: 0 0 1rem;
+  font-family: 'Georgia', serif;
+  font-size: 1.3rem;
+  border-bottom: 1px dashed rgba(0,0,0,0.2);
+  padding-bottom: 0.5rem;
+}
+
+.add-member-btn {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  background: rgba(52,152,219,0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.add-member-btn:hover {
+  background: rgba(41,128,185,0.8);
+}
+
+.member-dropdown {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.member-dropdown select {
+  flex: 1;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.member-dropdown button {
+  padding: 0.5rem 1rem;
+  background: rgba(46,204,113,0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.member-dropdown button:hover {
+  background: rgba(39,174,96,0.8);
+}
+
+.messages {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+.bubble {
+  max-width: 70%;
+  padding: 0.75rem;
+  border-radius: 12px;
+  line-height: 1.4;
+  position: relative;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.bubble.self {
+  align-self: flex-end;
+  background: rgba(220,248,198,0.9);
+}
+
+.bubble.other {
+  align-self: flex-start;
+  background: rgba(255,255,255,0.9);
+}
+
+.input-box {
+  display: flex;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgba(0,0,0,0.2);
+}
+
+.input-box input {
+  flex: 1;
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  outline: none;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.input-box button {
+  padding: 0.5rem 1rem;
+  background: rgba(52,152,219,0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.input-box button:hover {
+  background: rgba(41,128,185,0.8);
+}
+
+.member-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  padding: 0.5rem;
+  background-color: rgba(253, 252, 245, 0.9);
+  background-image:
+  repeating-linear-gradient(
+    to bottom,
+    transparent,
+    transparent 23px,
+    rgba(200,200,200,0.4) 24px
+  ),
+  linear-gradient(
+    to right,
+    rgba(231,76,60,0.5) 4px,
+    transparent 4px
+  );
+  background-size: 100% 24px, 100% 100%;
+  border: 2px solid #ddd;
+  border-radius: 6px;
+}
+
+.member-dropdown select {
+  flex: 1;
+  padding: 0.5rem;
+  background-color: transparent;
+  border: none;
+  border-bottom: 2px solid rgba(0,0,0,0.3);
+  font-family: 'Segoe UI', sans-serif;
+  font-size: 1rem;
+}
+
+.member-dropdown select:focus {
+  outline: none;
+  border-bottom-color: rgba(231,76,60,0.8);
+}
+
+.confirm-add-btn {
+  padding: 0.5rem 0.75rem;
+  background: rgba(46,204,113,0.8);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.confirm-add-btn:hover {
+  background: rgba(39,174,96,0.8);
+}
