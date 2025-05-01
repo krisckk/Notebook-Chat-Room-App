@@ -1,0 +1,51 @@
+[debug] [2025-05-01T14:27:16.269Z] ----------------------------------------------------------------------
+[debug] [2025-05-01T14:27:16.270Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\user\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2025-05-01T14:27:16.271Z] CLI Version:   14.2.2
+[debug] [2025-05-01T14:27:16.271Z] Platform:      win32
+[debug] [2025-05-01T14:27:16.271Z] Node Version:  v22.12.0
+[debug] [2025-05-01T14:27:16.271Z] Time:          Thu May 01 2025 22:27:16 GMT+0800 (Taipei Standard Time)
+[debug] [2025-05-01T14:27:16.271Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-05-01T14:27:16.374Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-05-01T14:27:16.375Z] > authorizing via signed-in user (krischou.ck@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  C:\Users\user\OneDrive\Desktop\Code\Notebook-Chatroom-App
+
+Before we get started, keep in mind:
+
+  * You are initializing within an existing Firebase project directory
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-05-01T14:27:28.353Z] Using project from CLI flag: notebook-chat-room
+[debug] [2025-05-01T14:27:28.353Z] Checked if tokens are valid: true, expires at: 1746110652509
+[debug] [2025-05-01T14:27:28.353Z] Checked if tokens are valid: true, expires at: 1746110652509
+[debug] [2025-05-01T14:27:28.354Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/notebook-chat-room [none]
+[debug] [2025-05-01T14:27:28.902Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/notebook-chat-room 200
+[debug] [2025-05-01T14:27:28.902Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/notebook-chat-room {"projectId":"notebook-chat-room","projectNumber":"396742511625","displayName":"Notebook Chat Room","name":"projects/notebook-chat-room","resources":{"hostingSite":"notebook-chat-room"},"state":"ACTIVE","etag":"1_8a04161d-0f02-432f-a801-47402dfe61e6"}
+[info] i  Using project notebook-chat-room (Notebook Chat Room) 
+[info] 
+=== Hosting Setup
+[debug] [2025-05-01T14:27:28.905Z] Checked if tokens are valid: true, expires at: 1746110652509
+[debug] [2025-05-01T14:27:28.905Z] Checked if tokens are valid: true, expires at: 1746110652509
+[debug] [2025-05-01T14:27:28.905Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/notebook-chat-room [none]
+[debug] [2025-05-01T14:27:29.185Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/notebook-chat-room 200
+[debug] [2025-05-01T14:27:29.185Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/notebook-chat-room {"projectId":"notebook-chat-room","projectNumber":"396742511625","displayName":"Notebook Chat Room","name":"projects/notebook-chat-room","resources":{"hostingSite":"notebook-chat-room"},"state":"ACTIVE","etag":"1_8a04161d-0f02-432f-a801-47402dfe61e6"}
+[info] 
+[info] Your public directory is the folder (relative to your project directory) that
+[info] will contain Hosting assets to be uploaded with firebase deploy. If you
+[info] have a build process for your assets, use your build's output directory.
+[info] 

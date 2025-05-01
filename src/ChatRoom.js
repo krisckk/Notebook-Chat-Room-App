@@ -10,6 +10,7 @@ export default function ChatRoom({ user, roomId, friend, flippingFromSignIn }) {
 
   // Load messages for this chat room
   useEffect(() => {
+    
     if (!roomId) return;
 
     const q = query(
